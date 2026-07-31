@@ -1,0 +1,3 @@
+/frontend/   @KISHOR403
+/backend/    @paraspathania
+/shared/     @paraspathania @KISHOR403
