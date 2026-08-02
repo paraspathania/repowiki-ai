@@ -1,44 +1,89 @@
 "use client";
 
-import { Download, FileText, File } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ExportTrigger } from "@/components/exports/ExportTrigger";
+import { ExportHistoryList } from "@/components/exports/ExportHistoryList";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+
+export interface ExportJob {
+  id: string;
+  format: "markdown" | "pdf";
+  status: "pending" | "processing" | "ready" | "failed";
+  created_at: string;
+  file_url?: string;
+  size_bytes?: number;
+}
 
 export default function ExportsPage({ params }: { params: { repoId: string } }) {
+  const [jobs, setJobs] = useState<ExportJob[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [activeFormat, setActiveFormat] = useState<"markdown" | "pdf">("markdown");
+
+  const fetchJobs = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/repositories/${params.repoId}/exports`);
+      if (res.ok) {
+        const data = await res.json();
+        setJobs(data.exports || []);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchJobs();
+    
+    // Poll every 3 seconds if there are pending/processing jobs
+    const hasActiveJobs = jobs.some(j => j.status === "pending" || j.status === "processing");
+    if (hasActiveJobs) {
+      const interval = setInterval(fetchJobs, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [jobs, params.repoId]);
+
+  const handleGenerate = async () => {
+    setIsGenerating(true);
+    try {
+      const res = await fetch(`${API_BASE}/repositories/${params.repoId}/exports`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ format: activeFormat }),
+      });
+      if (res.ok) {
+        await fetchJobs();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
-    <div className="w-full h-full p-8 space-y-6 overflow-y-auto">
-      <div className="flex items-center gap-3 border-b border-border pb-4">
-        <Download className="w-6 h-6 text-amber-400" />
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", backgroundColor: "#11111b", padding: "32px", overflowY: "auto" }}>
+      <div style={{ maxWidth: "800px", width: "100%", margin: "0 auto", display: "flex", flexDirection: "column", gap: "32px" }}>
+        
         <div>
-          <h2 className="text-xl font-bold text-white">Documentation Export</h2>
-          <p className="text-gray-400 text-xs mt-0.5">Export generated technical Wiki and architectural diagrams</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-panel border border-border p-6 rounded-xl space-y-4">
-          <div className="flex items-center gap-3">
-            <FileText className="w-6 h-6 text-accent-blue" />
-            <div>
-              <h3 className="font-bold text-white">Markdown Export</h3>
-              <p className="text-gray-400 text-xs">Standard GitHub-flavored markdown bundle</p>
-            </div>
-          </div>
-          <button className="w-full py-2.5 bg-surface hover:bg-border/60 border border-border text-white text-xs font-semibold rounded-lg transition">
-            Export Markdown (.md)
-          </button>
+          <h1 style={{ fontSize: "24px", fontWeight: "bold", color: "#cdd6f4", marginBottom: "8px" }}>Export Documentation</h1>
+          <p style={{ color: "#a6adc8" }}>Generate comprehensive offline documentation for this repository.</p>
         </div>
 
-        <div className="bg-panel border border-border p-6 rounded-xl space-y-4">
-          <div className="flex items-center gap-3">
-            <File className="w-6 h-6 text-red-400" />
-            <div>
-              <h3 className="font-bold text-white">PDF Documentation</h3>
-              <p className="text-gray-400 text-xs">Formatted PDF document with embedded diagrams</p>
-            </div>
-          </div>
-          <button className="w-full py-2.5 bg-surface hover:bg-border/60 border border-border text-white text-xs font-semibold rounded-lg transition">
-            Export PDF (.pdf)
-          </button>
+        <div style={{ backgroundColor: "#1e1e2e", border: "1px solid #313244", borderRadius: "12px", padding: "24px" }}>
+          <ExportTrigger
+            format={activeFormat}
+            onChangeFormat={setActiveFormat}
+            onGenerate={handleGenerate}
+            isGenerating={isGenerating}
+          />
         </div>
+
+        <div>
+          <h2 style={{ fontSize: "18px", fontWeight: "bold", color: "#cdd6f4", marginBottom: "16px" }}>Export History</h2>
+          <ExportHistoryList jobs={jobs} />
+        </div>
+
       </div>
     </div>
   );
