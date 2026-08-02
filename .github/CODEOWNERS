@@ -1,0 +1,15 @@
+# CODEOWNERS
+# These owners will be automatically requested for review
+# when a PR touches files in the matching path.
+
+# Frontend — owned by Kishor
+/frontend/   @KISHOR403
+
+# Backend — owned by Paras
+/backend/    @paraspathania
+
+# Shared contract — both must review, since changes here affect both sides
+/shared/     @paraspathania @KISHOR403
+
+# CI/CD workflows — both should review changes here too
+/.github/    @paraspathania @KISHOR403

@@ -1,3 +1,18 @@
+# Frontend (Next.js)
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
+
+# Backend (Python/FastAPI)
+backend/__pycache__/
+backend/*.pyc
+backend/venv/
+backend/.env
+
+# General
+.DS_Store
+*.log
+
 # Logs
 logs
 *.log
@@ -141,3 +156,4 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
