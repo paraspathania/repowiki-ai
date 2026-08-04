@@ -7,7 +7,7 @@ export interface User {
   name: string;
   email: string;
   avatar: string;
-  provider: "google" | "github" | "microsoft";
+  provider: "google" | "github";
 }
 
 interface AuthContextType {
@@ -16,7 +16,7 @@ interface AuthContextType {
   isAuthModalOpen: boolean;
   openAuthModal: () => void;
   closeAuthModal: () => void;
-  signIn: (provider: "google" | "github" | "microsoft") => void;
+  signIn: (provider: "google" | "github") => void;
   signOut: () => void;
 }
 
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const openAuthModal = useCallback(() => setIsAuthModalOpen(true), []);
   const closeAuthModal = useCallback(() => setIsAuthModalOpen(false), []);
 
-  const signIn = useCallback((provider: "google" | "github" | "microsoft") => {
+  const signIn = useCallback((provider: "google" | "github") => {
     // Simulated OAuth sign-in — in production this would redirect to your backend OAuth endpoint
     const mockUsers: Record<string, User> = {
       google: {
@@ -58,13 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         avatar: "",
         provider: "github",
       },
-      microsoft: {
-        id: "ms-001",
-        name: "Alex Developer",
-        email: "alex@outlook.com",
-        avatar: "",
-        provider: "microsoft",
-      },
+
     };
 
     const mockUser = mockUsers[provider];

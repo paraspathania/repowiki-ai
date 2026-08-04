@@ -45,7 +45,6 @@ export function UserMenu() {
   const providerColors: Record<string, string> = {
     google: "from-blue-500 to-red-500",
     github: "from-gray-600 to-gray-800",
-    microsoft: "from-blue-500 to-green-500",
   };
 
   return (

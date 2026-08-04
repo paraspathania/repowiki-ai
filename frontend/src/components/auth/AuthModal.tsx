@@ -23,16 +23,7 @@ function GitHubIcon() {
   );
 }
 
-function MicrosoftIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 23 23">
-      <rect x="1" y="1" width="10" height="10" fill="#f25022" />
-      <rect x="12" y="1" width="10" height="10" fill="#7fba00" />
-      <rect x="1" y="12" width="10" height="10" fill="#00a4ef" />
-      <rect x="12" y="12" width="10" height="10" fill="#ffb900" />
-    </svg>
-  );
-}
+
 
 export function AuthModal() {
   const { isAuthModalOpen, closeAuthModal, signIn } = useAuth();
@@ -118,13 +109,6 @@ export function AuthModal() {
               <span>Continue with GitHub</span>
             </button>
 
-            <button
-              onClick={() => signIn("microsoft")}
-              className="group w-full flex items-center justify-center gap-3 px-4 py-3 bg-white hover:bg-gray-100 text-gray-900 font-medium text-sm rounded-xl transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]"
-            >
-              <MicrosoftIcon />
-              <span>Continue with Microsoft</span>
-            </button>
           </div>
 
           {/* Continue Browsing */}
