@@ -34,37 +34,44 @@ export function RepositoryPreviewCard({ preview, repoUrl }: RepositoryPreviewPro
   const formattedSize = (preview.size_bytes / (1024 * 1024)).toFixed(1);
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-panel border border-border rounded-xl p-6 space-y-6 shadow-xl">
+    <div className="w-full max-w-2xl mx-auto glass-panel rounded-2xl p-6 space-y-6 shadow-2xl animate-fade-in relative overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+      
       <div className="flex items-start justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold text-white">{preview.full_name}</h2>
-            <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1 ${
-              preview.visibility === 'private' ? 'bg-amber-950/60 text-amber-400 border border-amber-800/50' : 'bg-blue-950/60 text-blue-400 border border-blue-800/50'
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">{preview.full_name}</h2>
+            <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1.5 border backdrop-blur-md ${
+              preview.visibility === 'private' 
+                ? 'bg-amber-500/10 text-amber-300 border-amber-500/20' 
+                : 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20'
             }`}>
               {preview.visibility === 'private' ? <Lock className="w-3 h-3" /> : <Globe className="w-3 h-3" />}
-              {preview.visibility}
+              <span className="capitalize">{preview.visibility}</span>
             </span>
           </div>
           {preview.description && (
-            <p className="text-gray-400 text-sm mt-2 line-clamp-2">{preview.description}</p>
+            <p className="text-slate-400 text-sm leading-relaxed max-w-xl">{preview.description}</p>
           )}
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-border/50 text-xs text-gray-300">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/[0.06] text-xs">
+        <div className="flex items-center gap-4 text-slate-300">
           <div className="flex items-center gap-1.5">
             <Star className="w-4 h-4 text-amber-400" />
-            <span>{preview.stars.toLocaleString()} stars</span>
+            <span className="font-semibold text-white">{preview.stars.toLocaleString()}</span>
+            <span className="text-slate-500">stars</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <GitFork className="w-4 h-4 text-gray-400" />
-            <span>{preview.forks.toLocaleString()} forks</span>
+            <GitFork className="w-4 h-4 text-slate-400" />
+            <span className="font-semibold text-white">{preview.forks.toLocaleString()}</span>
+            <span className="text-slate-500">forks</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <HardDrive className="w-4 h-4 text-gray-400" />
-            <span>{formattedSize} MB</span>
+            <HardDrive className="w-4 h-4 text-slate-400" />
+            <span className="font-semibold text-white">{formattedSize}</span>
+            <span className="text-slate-500">MB</span>
           </div>
         </div>
 
@@ -79,7 +86,7 @@ export function RepositoryPreviewCard({ preview, repoUrl }: RepositoryPreviewPro
         <button
           onClick={handleStartAnalysis}
           disabled={starting}
-          className="w-full py-3.5 bg-accent hover:bg-accent-hover text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-50 text-base"
+          className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold rounded-xl flex items-center justify-center gap-2.5 transition duration-300 shadow-xl shadow-indigo-500/10 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none shimmer-btn text-base"
         >
           {starting ? (
             <>

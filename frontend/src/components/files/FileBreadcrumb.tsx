@@ -11,13 +11,13 @@ export function FileBreadcrumb({ path, onNavigate }: FileBreadcrumbProps) {
   const parts = path.split("/").filter(Boolean);
 
   return (
-    <div className="flex items-center gap-1.5 text-xs text-gray-400 font-mono py-2 px-4 bg-surface border-b border-border overflow-x-auto">
+    <div className="flex items-center gap-2 text-xs text-slate-400 font-mono py-3 px-5 bg-panel/20 border-b border-white/[0.06] overflow-x-auto custom-scrollbar">
       <span
         onClick={() => onNavigate && onNavigate("/")}
-        className="hover:text-white cursor-pointer transition flex items-center gap-1"
+        className="hover:text-white cursor-pointer transition-colors duration-200 flex items-center gap-1.5"
       >
-        <Folder className="w-3.5 h-3.5 text-accent-blue" />
-        root
+        <Folder className="w-4 h-4 text-indigo-400" />
+        <span className="font-semibold text-slate-300">root</span>
       </span>
 
       {parts.map((part, idx) => {
@@ -25,16 +25,16 @@ export function FileBreadcrumb({ path, onNavigate }: FileBreadcrumbProps) {
         const isLast = idx === parts.length - 1;
 
         return (
-          <div key={currentPath} className="flex items-center gap-1.5">
-            <ChevronRight className="w-3 h-3 text-gray-600 flex-shrink-0" />
+          <div key={currentPath} className="flex items-center gap-2 flex-shrink-0">
+            <ChevronRight className="w-3.5 h-3.5 text-slate-700 flex-shrink-0" />
             <span
               onClick={() => onNavigate && onNavigate(currentPath)}
-              className={`hover:text-white cursor-pointer transition ${
-                isLast ? "text-white font-semibold" : ""
+              className={`hover:text-white cursor-pointer transition-colors duration-200 flex items-center gap-1.5 ${
+                isLast ? "text-white font-semibold" : "text-slate-300"
               }`}
             >
-              {isLast ? <FileText className="w-3.5 h-3.5 inline mr-1 text-gray-300" /> : null}
-              {part}
+              {isLast ? <FileText className="w-3.5 h-3.5 text-slate-400" /> : null}
+              <span>{part}</span>
             </span>
           </div>
         );

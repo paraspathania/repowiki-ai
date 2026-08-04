@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, DateTime, ForeignKey, Enum as SQLEnum, Array, ARRAY
+from sqlalchemy import String, DateTime, ForeignKey, Enum as SQLEnum, ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Optional, List
 import enum

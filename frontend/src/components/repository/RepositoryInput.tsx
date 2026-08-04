@@ -44,8 +44,8 @@ export function RepositoryInput({ onValidated }: RepositoryInputProps) {
 
   return (
     <form onSubmit={handleValidate} className="w-full max-w-2xl mx-auto space-y-4">
-      <div className="relative flex items-center">
-        <div className="absolute left-4 text-gray-400">
+      <div className="relative flex items-center bg-panel/40 border border-white/[0.08] focus-within:border-indigo-500/40 rounded-2xl p-1.5 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-300 shadow-2xl backdrop-blur-md">
+        <div className="absolute left-5 text-slate-400">
           <Search className="w-5 h-5" />
         </div>
         <input
@@ -53,13 +53,13 @@ export function RepositoryInput({ onValidated }: RepositoryInputProps) {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://github.com/owner/repository"
-          className="w-full pl-12 pr-36 py-4 bg-panel border border-border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent text-base transition"
+          className="w-full pl-14 pr-36 py-4 bg-transparent border-none text-white placeholder-slate-500 focus:outline-none focus:ring-0 text-base"
           disabled={loading}
         />
         <button
           type="submit"
           disabled={loading}
-          className="absolute right-2 px-5 py-2.5 bg-accent hover:bg-accent-hover text-white rounded-lg font-medium flex items-center gap-2 transition disabled:opacity-50"
+          className="absolute right-2 px-6 py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl font-semibold flex items-center gap-2 transition duration-300 shadow-lg shadow-indigo-500/20 active:scale-95 disabled:opacity-50 disabled:pointer-events-none shimmer-btn"
         >
           {loading ? (
             <>
@@ -76,8 +76,8 @@ export function RepositoryInput({ onValidated }: RepositoryInputProps) {
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-950/40 border border-red-800/50 rounded-lg text-red-300 text-sm">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+        <div className="flex items-center gap-3 p-4 bg-red-950/20 border border-red-500/20 rounded-xl text-red-300 text-sm backdrop-blur-md shadow-lg shadow-red-950/10 animate-fade-in">
+          <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-400" />
           <span>{error}</span>
         </div>
       )}

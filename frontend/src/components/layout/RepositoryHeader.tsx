@@ -1,6 +1,6 @@
 "use client";
 
-import { GitBranch, ExternalLink, RefreshCw, Download } from "lucide-react";
+import { GitBranch, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 interface RepositoryHeaderProps {
@@ -11,16 +11,16 @@ interface RepositoryHeaderProps {
 
 export function RepositoryHeader({ repoName, branch, githubUrl }: RepositoryHeaderProps) {
   return (
-    <header className="h-14 bg-panel border-b border-border px-6 flex items-center justify-between text-xs">
+    <header className="h-16 bg-panel/50 backdrop-blur-md border-b border-white/[0.06] px-6 flex items-center justify-between text-xs sticky top-0 z-30">
       <div className="flex items-center gap-4">
-        <Link href="/" className="font-bold text-white text-sm hover:text-accent-blue transition">
+        <Link href="/" className="font-extrabold text-white text-sm hover:text-indigo-400 transition duration-200 tracking-tight">
           RepoWiki AI
         </Link>
-        <span className="text-gray-600">/</span>
-        <span className="text-gray-200 font-medium">{repoName}</span>
-        <div className="flex items-center gap-1 px-2.5 py-1 bg-surface border border-border rounded-md text-gray-300">
-          <GitBranch className="w-3.5 h-3.5 text-accent" />
-          <span>{branch}</span>
+        <span className="text-slate-700">/</span>
+        <span className="text-slate-200 font-semibold text-xs tracking-tight">{repoName}</span>
+        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-surface/50 border border-white/[0.08] rounded-full text-slate-300">
+          <GitBranch className="w-3.5 h-3.5 text-indigo-400" />
+          <span className="font-medium font-mono text-[10px]">{branch}</span>
         </div>
       </div>
 
@@ -29,7 +29,7 @@ export function RepositoryHeader({ repoName, branch, githubUrl }: RepositoryHead
           href={githubUrl}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-surface hover:bg-border/60 text-gray-300 border border-border rounded-md transition"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 rounded-lg transition duration-200 font-medium"
         >
           <span>Open on GitHub</span>
           <ExternalLink className="w-3.5 h-3.5" />
