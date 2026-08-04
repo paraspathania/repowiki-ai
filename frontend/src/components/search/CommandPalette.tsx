@@ -206,9 +206,9 @@ export function CommandPalette({ repositoryId, isOpen, onClose, onSelectResult }
             <span>to close</span>
           </div>
         </div>
-        <style dangerouslySetInnerHTML={{ __html: \`
+        <style dangerouslySetInnerHTML={{ __html: `
           @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        \`}} />
+        ` }} />
       </div>
     </div>
   );

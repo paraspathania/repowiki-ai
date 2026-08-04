@@ -16,7 +16,7 @@ export function ChatComposer({ onSend, isStreaming, suggestions = [] }: ChatComp
   const adjustHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = \`\${Math.min(textareaRef.current.scrollHeight, 120)}px\`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
     }
   };
 
@@ -124,9 +124,9 @@ export function ChatComposer({ onSend, isStreaming, suggestions = [] }: ChatComp
           )}
         </button>
       </div>
-      <style dangerouslySetInnerHTML={{ __html: \`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-      \`}} />
+      ` }} />
     </div>
   );
 }

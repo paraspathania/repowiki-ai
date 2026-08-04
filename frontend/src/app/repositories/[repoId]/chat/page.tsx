@@ -142,7 +142,6 @@ export default function ChatPage({ params }: { params: { repoId: string } }) {
   };
 
   return (
-  return (
     <div className="w-full h-full flex bg-background relative overflow-hidden">
       <div className="absolute inset-0 radial-glow-light pointer-events-none z-0" />
 

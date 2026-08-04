@@ -31,19 +31,19 @@ export function StreamingIndicator() {
                 height: "6px",
                 backgroundColor: "#89b4fa",
                 borderRadius: "50%",
-                animation: \`bounce 1.4s infinite ease-in-out both\`,
-                animationDelay: \`\${i * 0.16}s\`,
+                animation: `bounce 1.4s infinite ease-in-out both`,
+                animationDelay: `${i * 0.16}s`,
               }}
             />
           ))}
         </div>
       </div>
-      <style dangerouslySetInnerHTML={{ __html: \`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes bounce {
           0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
           40% { transform: scale(1); opacity: 1; }
         }
-      \`}} />
+      ` }} />
     </div>
   );
 }

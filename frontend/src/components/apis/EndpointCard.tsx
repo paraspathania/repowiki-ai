@@ -42,7 +42,7 @@ export function EndpointCard({ endpoint, repoId }: EndpointCardProps) {
         <span style={{ 
           backgroundColor: colors.bg, 
           color: colors.text, 
-          border: \`1px solid \${colors.border}\`,
+          border: `1px solid ${colors.border}`,
           padding: "4px 10px", 
           borderRadius: "6px", 
           fontSize: "12px", 
@@ -75,11 +75,11 @@ export function EndpointCard({ endpoint, repoId }: EndpointCardProps) {
           <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px" }}>
             <span style={{ color: "#a6adc8", minWidth: "80px" }}>Source:</span>
             <Link 
-              href={\`/repositories/\${repoId}/files?path=\${encodeURIComponent(endpoint.file_path)}\`}
+              href={`/repositories/${repoId}/files?path=${encodeURIComponent(endpoint.file_path)}`}
               style={{ display: "flex", alignItems: "center", gap: "6px", color: "#cba6f7", textDecoration: "none", fontFamily: "monospace" }}
             >
               <FileCode size={14} />
-              {endpoint.file_path} {endpoint.line_number ? \`:L\${endpoint.line_number}\` : ""}
+              {endpoint.file_path} {endpoint.line_number ? `:L${endpoint.line_number}` : ""}
               <ArrowRight size={14} style={{ marginLeft: "4px" }} />
             </Link>
           </div>
