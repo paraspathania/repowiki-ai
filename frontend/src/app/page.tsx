@@ -4,7 +4,9 @@ import { useState } from "react";
 import { RepositoryInput } from "@/components/repository/RepositoryInput";
 import { RepositoryPreviewCard } from "@/components/repository/RepositoryPreview";
 import { RepositoryPreview } from "@/types";
-import { BookOpen, GitBranch, Cpu, Sparkles } from "lucide-react";
+import { BookOpen, GitBranch, Cpu, Sparkles, LogIn } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { UserMenu } from "@/components/auth/UserMenu";
 
 export default function HomePage() {
   const [preview, setPreview] = useState<RepositoryPreview | null>(null);
@@ -15,6 +17,17 @@ export default function HomePage() {
       {/* Background patterns */}
       <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none z-0" />
       <div className="absolute inset-0 radial-glow pointer-events-none z-0" />
+
+      {/* Top Navigation Bar */}
+      <nav className="relative z-20 flex items-center justify-between w-full max-w-5xl mx-auto">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-indigo-400" />
+          <span className="text-sm font-bold text-white tracking-tight">
+            RepoWiki AI
+          </span>
+        </div>
+        <UserMenu />
+      </nav>
 
       <div className="relative z-10 max-w-5xl mx-auto w-full space-y-16 flex-1 flex flex-col justify-center">
         {/* Header Hero */}
