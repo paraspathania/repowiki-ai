@@ -6,6 +6,7 @@ import re
 
 from app.shared.utils.secret_redactor import redact_secrets
 
+
 @dataclass
 class CodeChunkData:
     repository_id: uuid.UUID
@@ -43,11 +44,16 @@ class CodeChunker:
             if match:
                 symbol_name = match.group(1)
                 symbol_type = pattern.split(r'\s+')[0].strip('^')
-                if 'class' in pattern: symbol_type = 'class'
-                elif 'def' in pattern or 'function' in pattern: symbol_type = 'function'
-                elif 'const' in pattern: symbol_type = 'constant'
-                elif 'interface' in pattern: symbol_type = 'interface'
-                elif 'type' in pattern: symbol_type = 'type'
+                if 'class' in pattern:
+                    symbol_type = 'class'
+                elif 'def' in pattern or 'function' in pattern:
+                    symbol_type = 'function'
+                elif 'const' in pattern:
+                    symbol_type = 'constant'
+                elif 'interface' in pattern:
+                    symbol_type = 'interface'
+                elif 'type' in pattern:
+                    symbol_type = 'type'
                 return symbol_name, symbol_type
         return None, None
 
