@@ -59,7 +59,6 @@ export default function WikiPage({ params }: { params: { repoId: string } }) {
         method: "POST",
       });
       if (res.ok) {
-        // Mocked response handling, in real app might need polling
         fetchWiki();
       }
     } catch (err) {
@@ -70,35 +69,26 @@ export default function WikiPage({ params }: { params: { repoId: string } }) {
   };
 
   const handleRegenerateSection = async (slug: string) => {
-    // In a real app, you might call an endpoint like POST /wiki/sections/{slug}/regenerate
-    console.log(\`Regenerating section \${slug}\`);
+    console.log(`Regenerating section ${slug}`);
   };
 
   const activeSection = sections.find((s) => s.slug === activeSectionSlug);
 
   if (!isReady && !isGenerating) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", width: "100%", backgroundColor: "#11111b", padding: "32px" }}>
-        <div style={{ textAlign: "center", maxWidth: "400px", padding: "32px", backgroundColor: "#1e1e2e", borderRadius: "16px", border: "1px solid #313244" }}>
-          <div style={{ display: "inline-flex", padding: "16px", backgroundColor: "rgba(137, 180, 250, 0.1)", borderRadius: "50%", marginBottom: "16px" }}>
-            <BookOpen size={48} color="#89b4fa" />
+      <div className="w-full h-full flex flex-col items-center justify-center bg-background p-8 relative">
+        <div className="absolute inset-0 radial-glow-light pointer-events-none z-0" />
+        <div className="relative z-10 text-center max-w-md p-8 glass-panel rounded-2xl border border-white/[0.08] shadow-2xl">
+          <div className="inline-flex p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-indigo-400 mb-5">
+            <BookOpen className="w-8 h-8" />
           </div>
-          <h2 style={{ color: "#cdd6f4", fontSize: "24px", fontWeight: "bold", marginBottom: "8px" }}>Repository Wiki</h2>
-          <p style={{ color: "#a6adc8", fontSize: "14px", marginBottom: "24px", lineHeight: 1.5 }}>
+          <h2 className="text-white text-2xl font-bold tracking-tight mb-2">Repository Wiki</h2>
+          <p className="text-slate-400 text-sm leading-relaxed mb-6">
             The wiki has not been generated for this repository yet. Generate it now to get comprehensive documentation grounded in the source code.
           </p>
           <button
             onClick={handleGenerate}
-            style={{
-              padding: "12px 24px",
-              backgroundColor: "#cba6f7",
-              color: "#11111b",
-              border: "none",
-              borderRadius: "8px",
-              fontWeight: "bold",
-              cursor: "pointer",
-              width: "100%",
-            }}
+            className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-500/10 transition-all duration-200 active:scale-98"
           >
             Generate Wiki
           </button>
@@ -109,19 +99,23 @@ export default function WikiPage({ params }: { params: { repoId: string } }) {
 
   if (isGenerating) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", width: "100%", backgroundColor: "#11111b" }}>
-        <Loader2 size={48} color="#cba6f7" style={{ animation: "spin 1s linear infinite", marginBottom: "16px" }} />
-        <h2 style={{ color: "#cdd6f4", fontSize: "20px", fontWeight: "bold" }}>Generating Wiki...</h2>
-        <p style={{ color: "#a6adc8", fontSize: "14px", marginTop: "8px" }}>This might take a few minutes depending on the repository size.</p>
-        <style dangerouslySetInnerHTML={{ __html: \`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\`}} />
+      <div className="w-full h-full flex flex-col items-center justify-center bg-background p-8 relative">
+        <div className="absolute inset-0 radial-glow-light pointer-events-none z-0" />
+        <div className="relative z-10 flex flex-col items-center max-w-sm text-center">
+          <Loader2 className="w-12 h-12 text-indigo-400 animate-spin mb-4" />
+          <h2 className="text-white text-xl font-bold tracking-tight mb-2">Generating Wiki...</h2>
+          <p className="text-slate-400 text-sm">This might take a few minutes depending on the repository size.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ display: "flex", height: "100%", width: "100%", backgroundColor: "#11111b", overflow: "hidden" }}>
+    <div className="w-full h-full flex bg-background relative overflow-hidden">
+      <div className="absolute inset-0 radial-glow-light pointer-events-none z-0" />
+
       {/* Sidebar */}
-      <div style={{ width: "280px", borderRight: "1px solid #313244", flexShrink: 0, backgroundColor: "#181825" }}>
+      <div className="relative z-10 w-[280px] border-r border-white/[0.06] flex-shrink-0 bg-white/[0.01]">
         <WikiSidebar
           sections={sections}
           activeSectionSlug={activeSectionSlug}
@@ -130,11 +124,11 @@ export default function WikiPage({ params }: { params: { repoId: string } }) {
       </div>
 
       {/* Content */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "48px", position: "relative" }}>
+      <div className="relative z-10 flex-1 overflow-y-auto p-8 custom-scrollbar">
         {activeSection ? (
           <WikiSectionComponent section={activeSection} onRegenerate={() => handleRegenerateSection(activeSection.slug)} />
         ) : (
-          <div style={{ color: "#a6adc8", textAlign: "center", marginTop: "100px" }}>Select a section to view</div>
+          <div className="text-slate-500 text-center mt-24 text-sm">Select a section to view</div>
         )}
       </div>
     </div>

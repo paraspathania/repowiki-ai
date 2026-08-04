@@ -33,26 +33,28 @@ export function FileTreeNode({ node, selectedPath, onSelect }: FileTreeNodeProps
     <div className="select-none">
       <div
         onClick={handleToggle}
-        className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs cursor-pointer transition ${
-          isSelected ? "bg-accent/20 text-white font-medium" : "text-gray-300 hover:bg-panel hover:text-white"
+        className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs cursor-pointer transition border ${
+          isSelected 
+            ? "bg-indigo-500/10 text-indigo-300 font-semibold border-indigo-500/20" 
+            : "text-slate-300 hover:bg-white/[0.02] hover:text-white border-transparent"
         }`}
       >
         {isFolder ? (
           <>
-            {isOpen ? <ChevronDown className="w-3.5 h-3.5 text-gray-500" /> : <ChevronRight className="w-3.5 h-3.5 text-gray-500" />}
-            {isOpen ? <FolderOpen className="w-4 h-4 text-accent-blue" /> : <Folder className="w-4 h-4 text-accent-blue" />}
+            {isOpen ? <ChevronDown className="w-3.5 h-3.5 text-slate-500" /> : <ChevronRight className="w-3.5 h-3.5 text-slate-500" />}
+            {isOpen ? <FolderOpen className="w-4 h-4 text-indigo-400" /> : <Folder className="w-4 h-4 text-indigo-400" />}
           </>
         ) : (
           <>
             <span className="w-3.5" />
-            <FileText className="w-4 h-4 text-gray-400" />
+            <FileText className="w-4 h-4 text-slate-400" />
           </>
         )}
         <span className="truncate">{node.name}</span>
       </div>
 
       {isFolder && isOpen && node.children && (
-        <div className="pl-4 border-l border-border/40 my-0.5 space-y-0.5">
+        <div className="pl-4 border-l border-white/[0.04] my-0.5 space-y-0.5 ml-[17px]">
           {node.children.map((child) => (
             <FileTreeNode
               key={child.path}

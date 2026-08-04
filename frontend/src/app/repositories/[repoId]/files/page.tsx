@@ -57,9 +57,9 @@ export default function FileExplorerPage({ params }: { params: { repoId: string 
   };
 
   return (
-    <div className="w-full h-full grid grid-cols-12 overflow-hidden">
+    <div className="w-full h-full grid grid-cols-12 overflow-hidden bg-background">
       {/* Panel 1: File Tree (25%) */}
-      <div className="col-span-3 h-full overflow-hidden">
+      <div className="col-span-3 h-full overflow-hidden bg-surface/10">
         <FileTree
           nodes={MOCK_TREE}
           selectedPath={selectedPath}
@@ -67,15 +67,15 @@ export default function FileExplorerPage({ params }: { params: { repoId: string 
         />
       </div>
 
-      {/* Panel 2: Code Viewer (50%) */}
-      <div className="col-span-5 h-full flex flex-col overflow-hidden bg-[#1e1e1e]">
+      {/* Panel 2: Code Viewer (41.6%) */}
+      <div className="col-span-5 h-full flex flex-col overflow-hidden bg-[#0d1117]/40 border-r border-white/[0.06]">
         <FileBreadcrumb path={selectedPath} onNavigate={setSelectedPath} />
         <div className="flex-1 overflow-hidden">
           <CodeViewer code={currentCode} language={selectedPath.split(".").pop()} />
         </div>
       </div>
 
-      {/* Panel 3: AI Context & Explanation (25%) */}
+      {/* Panel 3: AI Context & Explanation (33.3%) */}
       <div className="col-span-4 h-full overflow-hidden">
         <AIExplanationPanel
           repoId={params.repoId}

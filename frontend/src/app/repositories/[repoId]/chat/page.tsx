@@ -142,9 +142,12 @@ export default function ChatPage({ params }: { params: { repoId: string } }) {
   };
 
   return (
-    <div style={{ display: "flex", height: "100%", width: "100%", backgroundColor: "#11111b" }}>
+  return (
+    <div className="w-full h-full flex bg-background relative overflow-hidden">
+      <div className="absolute inset-0 radial-glow-light pointer-events-none z-0" />
+
       {/* Left panel */}
-      <div style={{ width: "260px", borderRight: "1px solid #313244", flexShrink: 0 }}>
+      <div className="relative z-10 w-[280px] border-r border-white/[0.06] flex-shrink-0 bg-white/[0.01]">
         <ChatSidebar
           sessions={sessions}
           activeSessionId={activeSessionId}
@@ -154,12 +157,12 @@ export default function ChatPage({ params }: { params: { repoId: string } }) {
       </div>
 
       {/* Center panel */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", position: "relative" }}>
-        <div style={{ flex: 1, overflowY: "auto", padding: "24px", display: "flex", flexDirection: "column", gap: "24px" }}>
+      <div className="relative z-10 flex-1 flex flex-col h-full overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6 custom-scrollbar">
           {messages.length === 0 ? (
-            <div style={{ margin: "auto", textAlign: "center", color: "#a6adc8" }}>
-              <h3 style={{ fontSize: "24px", color: "#cdd6f4", marginBottom: "8px" }}>Repository AI Chat</h3>
-              <p>Ask anything about the codebase.</p>
+            <div className="m-auto text-center space-y-3 max-w-md p-8 glass-panel rounded-2xl border border-white/[0.08] shadow-2xl">
+              <h3 className="text-2xl font-bold text-white tracking-tight">Repository AI Chat</h3>
+              <p className="text-slate-400 text-sm">Ask anything about the codebase. Queries are answered using contextual codebase knowledge.</p>
             </div>
           ) : (
             messages.map((msg, i) => (
@@ -168,7 +171,8 @@ export default function ChatPage({ params }: { params: { repoId: string } }) {
           )}
           {isStreaming && <StreamingIndicator />}
         </div>
-        <div style={{ padding: "16px 24px", borderTop: "1px solid #313244", backgroundColor: "#181825" }}>
+        
+        <div className="p-6 border-t border-white/[0.06] bg-white/[0.01] backdrop-blur-md">
           <ChatComposer
             onSend={handleSendMessage}
             isStreaming={isStreaming}

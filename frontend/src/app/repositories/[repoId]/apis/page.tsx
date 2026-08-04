@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { EndpointCard } from "@/components/apis/EndpointCard";
-import { Search, Filter, Loader2, ServerOff } from "lucide-react";
+import { Search, Filter, Loader2, ServerOff, Server } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
@@ -50,62 +50,52 @@ export default function APIsPage({ params }: { params: { repoId: string } }) {
 
   if (loading) {
     return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%", width: "100%", backgroundColor: "#11111b" }}>
-        <Loader2 size={32} color="#89b4fa" style={{ animation: "spin 1s linear infinite" }} />
-        <style dangerouslySetInnerHTML={{ __html: \`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\`}} />
+      <div className="flex items-center justify-center w-full h-full bg-background min-h-[400px]">
+        <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", backgroundColor: "#11111b", padding: "32px", overflow: "hidden" }}>
-      <div style={{ maxWidth: "1000px", width: "100%", margin: "0 auto", display: "flex", flexDirection: "column", height: "100%" }}>
-        
-        <div style={{ marginBottom: "24px" }}>
-          <h1 style={{ fontSize: "24px", fontWeight: "bold", color: "#cdd6f4", marginBottom: "8px" }}>API Explorer</h1>
-          <p style={{ color: "#a6adc8" }}>Automatically detected API routes and their handlers.</p>
+    <div className="w-full h-full p-8 space-y-6 overflow-y-auto custom-scrollbar relative bg-background">
+      <div className="absolute inset-0 radial-glow-light pointer-events-none z-0" />
+
+      <div className="relative z-10 space-y-6 max-w-5xl mx-auto">
+        <div className="flex items-center gap-3 border-b border-white/[0.06] pb-5">
+          <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+            <Server className="w-5.5 h-5.5" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white tracking-tight">API Explorer</h2>
+            <p className="text-slate-400 text-xs mt-0.5">Automatically detected API routes and their handlers.</p>
+          </div>
         </div>
 
         {/* Filters */}
-        <div style={{ display: "flex", gap: "16px", marginBottom: "24px", flexWrap: "wrap", alignItems: "center" }}>
-          <div style={{ flex: 1, minWidth: "250px", position: "relative" }}>
-            <Search size={18} color="#a6adc8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex-1 min-w-[250px] relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
             <input
               type="text"
               placeholder="Search endpoints or handlers..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px 12px 10px 40px",
-                backgroundColor: "#181825",
-                border: "1px solid #313244",
-                borderRadius: "8px",
-                color: "#cdd6f4",
-                fontSize: "14px",
-                outline: "none",
-              }}
+              className="w-full pl-10 pr-4 py-2.5 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500/30 focus:bg-white/[0.05] transition-all"
             />
           </div>
           
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            <Filter size={16} color="#a6adc8" />
-            <div style={{ display: "flex", backgroundColor: "#181825", borderRadius: "8px", border: "1px solid #313244", padding: "2px" }}>
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-slate-400" />
+            <div className="flex p-0.5 bg-white/[0.03] border border-white/[0.08] rounded-xl">
               {methods.map((m) => (
                 <button
                   key={m}
                   onClick={() => setMethodFilter(m)}
-                  style={{
-                    padding: "6px 12px",
-                    borderRadius: "6px",
-                    backgroundColor: methodFilter === m ? "#313244" : "transparent",
-                    color: methodFilter === m ? "#cdd6f4" : "#a6adc8",
-                    fontSize: "12px",
-                    fontWeight: methodFilter === m ? "bold" : "normal",
-                    border: "none",
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                  }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                    methodFilter === m 
+                      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20" 
+                      : "text-slate-400 hover:text-slate-200"
+                  }`}
                 >
                   {m}
                 </button>
@@ -115,16 +105,16 @@ export default function APIsPage({ params }: { params: { repoId: string } }) {
         </div>
 
         {/* List */}
-        <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: "12px", paddingRight: "8px" }}>
+        <div className="space-y-4">
           {filteredEndpoints.length > 0 ? (
             filteredEndpoints.map((ep) => (
               <EndpointCard key={ep.id} endpoint={ep} repoId={params.repoId} />
             ))
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "64px", color: "#a6adc8", border: "1px dashed #313244", borderRadius: "12px", marginTop: "24px" }}>
-              <ServerOff size={48} color="#45475a" style={{ marginBottom: "16px" }} />
-              <h3 style={{ color: "#cdd6f4", fontSize: "18px", marginBottom: "8px" }}>No APIs detected</h3>
-              <p>Try adjusting your search filters or make sure the repository contains recognized routing files.</p>
+            <div className="flex flex-col items-center justify-center p-16 text-center border border-dashed border-white/[0.08] rounded-2xl bg-white/[0.01]">
+              <ServerOff className="w-12 h-12 text-slate-600 mb-4" />
+              <h3 className="text-white font-semibold text-lg mb-1">No APIs detected</h3>
+              <p className="text-slate-400 text-sm max-w-sm">Try adjusting your search filters or make sure the repository contains recognized routing files.</p>
             </div>
           )}
         </div>

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { ExportTrigger } from "@/components/exports/ExportTrigger";
 import { ExportHistoryList } from "@/components/exports/ExportHistoryList";
+import { Download } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
@@ -62,15 +63,21 @@ export default function ExportsPage({ params }: { params: { repoId: string } }) 
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", backgroundColor: "#11111b", padding: "32px", overflowY: "auto" }}>
-      <div style={{ maxWidth: "800px", width: "100%", margin: "0 auto", display: "flex", flexDirection: "column", gap: "32px" }}>
-        
-        <div>
-          <h1 style={{ fontSize: "24px", fontWeight: "bold", color: "#cdd6f4", marginBottom: "8px" }}>Export Documentation</h1>
-          <p style={{ color: "#a6adc8" }}>Generate comprehensive offline documentation for this repository.</p>
+    <div className="w-full h-full p-8 space-y-6 overflow-y-auto custom-scrollbar relative bg-background">
+      <div className="absolute inset-0 radial-glow-light pointer-events-none z-0" />
+
+      <div className="relative z-10 space-y-8 max-w-4xl mx-auto">
+        <div className="flex items-center gap-3 border-b border-white/[0.06] pb-5">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <Download className="w-5.5 h-5.5" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white tracking-tight">Documentation Export</h2>
+            <p className="text-slate-400 text-xs mt-0.5">Generate comprehensive offline documentation for this repository.</p>
+          </div>
         </div>
 
-        <div style={{ backgroundColor: "#1e1e2e", border: "1px solid #313244", borderRadius: "12px", padding: "24px" }}>
+        <div className="glass-panel p-6 rounded-2xl shadow-xl border border-white/[0.08]">
           <ExportTrigger
             format={activeFormat}
             onChangeFormat={setActiveFormat}
@@ -79,11 +86,12 @@ export default function ExportsPage({ params }: { params: { repoId: string } }) 
           />
         </div>
 
-        <div>
-          <h2 style={{ fontSize: "18px", fontWeight: "bold", color: "#cdd6f4", marginBottom: "16px" }}>Export History</h2>
-          <ExportHistoryList jobs={jobs} />
+        <div className="space-y-4">
+          <h2 className="text-lg font-bold text-white tracking-tight">Export History</h2>
+          <div className="glass-panel p-6 rounded-2xl border border-white/[0.08] shadow-xl">
+            <ExportHistoryList jobs={jobs} />
+          </div>
         </div>
-
       </div>
     </div>
   );
