@@ -80,33 +80,60 @@ function NavItem({ label, href, icon: Icon, isActive, isExpanded }: NavItemProps
 function BottomNavItem({
   icon: Icon,
   label,
+  href,
   onClick,
   isExpanded,
+  isActive,
 }: {
   icon: React.ElementType;
   label: string;
+  href?: string;
   onClick?: () => void;
   isExpanded: boolean;
+  isActive?: boolean;
 }) {
   const [showTooltip, setShowTooltip] = useState(false);
 
-  return (
-    <button
-      onClick={onClick}
-      className={`sidebar-nav-item group relative flex items-center ${
-        isExpanded ? "px-3 py-2 w-full justify-start gap-3" : "w-10 h-9 justify-center"
-      } rounded-xl text-slate-500 hover:text-slate-300 hover:bg-white/[0.04] transition-all duration-200`}
-      onMouseEnter={() => !isExpanded && setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
-    >
-      <Icon className="w-4 h-4 flex-shrink-0 transition-colors duration-200 group-hover:text-slate-300" />
-      {isExpanded && <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200">{label}</span>}
+  const content = (
+    <>
+      <Icon className={`w-4 h-4 flex-shrink-0 transition-colors duration-200 ${isActive ? "text-indigo-400" : "group-hover:text-slate-300"}`} />
+      {isExpanded && <span className={`text-xs font-medium ${isActive ? "text-white font-semibold" : "text-slate-400 group-hover:text-slate-200"}`}>{label}</span>}
       {!isExpanded && showTooltip && (
         <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-[#1a1d27] text-white text-[11px] font-medium rounded-lg whitespace-nowrap z-50 pointer-events-none border border-white/[0.1] shadow-xl shadow-black/80 animate-fade-in">
           {label}
           <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1d27] border-l border-b border-white/[0.1] rotate-45" />
         </div>
       )}
+    </>
+  );
+
+  const className = `sidebar-nav-item group relative flex items-center ${
+    isExpanded ? "px-3 py-2 w-full justify-start gap-3" : "w-10 h-9 justify-center"
+  } rounded-xl ${
+    isActive ? "bg-indigo-600/30 text-white border border-indigo-500/40" : "text-slate-500 hover:text-slate-300 hover:bg-white/[0.04]"
+  } transition-all duration-200`;
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className={className}
+        onMouseEnter={() => !isExpanded && setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      className={className}
+      onMouseEnter={() => !isExpanded && setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
+      {content}
     </button>
   );
 }
@@ -164,6 +191,8 @@ export function RepositorySidebar({ repoId }: RepositorySidebarProps) {
     { label: "Exports", href: `/repositories/${repoId}/exports`, icon: Download },
   ];
 
+  const isSettingsActive = pathname.startsWith(`/repositories/${repoId}/settings`);
+
   return (
     <aside
       className={`${
@@ -207,7 +236,13 @@ export function RepositorySidebar({ repoId }: RepositorySidebarProps) {
       <div className="flex flex-col items-center gap-1 pt-2 border-t border-white/[0.06] w-full px-2">
         <BottomNavItem icon={Bell} label="Notifications" isExpanded={isExpanded} />
         <BottomNavItem icon={HelpCircle} label="Help & Docs" isExpanded={isExpanded} />
-        <BottomNavItem icon={Settings} label="Settings" isExpanded={isExpanded} />
+        <BottomNavItem
+          icon={Settings}
+          label="Settings"
+          href={`/repositories/${repoId}/settings`}
+          isActive={isSettingsActive}
+          isExpanded={isExpanded}
+        />
         <UserAvatar isExpanded={isExpanded} />
       </div>
     </aside>
