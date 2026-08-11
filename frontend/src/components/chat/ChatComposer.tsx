@@ -61,8 +61,8 @@ export function ChatComposer({ onSend, isStreaming, suggestions = [] }: ChatComp
 
       {/* Input Bar */}
       <div className="relative group">
-        <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-indigo-500/20 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 blur-sm" />
-        <div className="relative flex items-end gap-3 bg-[#0d101a] border border-white/[0.1] rounded-2xl p-3 group-focus-within:border-indigo-500/40 transition-all duration-200 shadow-xl shadow-black/20">
+        <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-indigo-500/20 rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 blur-sm" />
+        <div className="relative flex items-end gap-3 bg-[#0d101a] border border-white/[0.1] rounded-full px-4 py-2.5 group-focus-within:border-indigo-500/40 transition-all duration-200 shadow-xl shadow-black/20">
           {/* Left side actions */}
           <button className="p-2 rounded-xl text-slate-500 hover:text-slate-300 hover:bg-white/[0.06] transition flex-shrink-0 mb-0.5" title="Attach context file">
             <Paperclip className="w-4 h-4" />
