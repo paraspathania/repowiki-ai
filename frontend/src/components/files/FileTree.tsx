@@ -32,9 +32,9 @@ export function FileTree({ nodes, selectedPath, onSelect }: FileTreeProps) {
   const filteredNodes = filterNodes(nodes, filter);
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#090c14] border-r border-white/[0.08]">
+    <div className="w-full h-full flex flex-col bg-black border-r border-white/[0.08]">
       {/* Explorer Header Bar */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-white/[0.08] bg-[#0c101b]">
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-white/[0.08] bg-black">
         <div className="flex items-center gap-2">
           <FolderTree className="w-3.5 h-3.5 text-indigo-400" />
           <span className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider">
@@ -49,7 +49,7 @@ export function FileTree({ nodes, selectedPath, onSelect }: FileTreeProps) {
       </div>
 
       {/* Dark IDE Search Bar */}
-      <div className="p-2.5 border-b border-white/[0.06] bg-[#070a10]">
+      <div className="p-2.5 border-b border-white/[0.06] bg-black">
         <div className="relative flex items-center">
           <Search className="w-3.5 h-3.5 absolute left-3 text-slate-500 pointer-events-none" />
           <input
@@ -57,7 +57,7 @@ export function FileTree({ nodes, selectedPath, onSelect }: FileTreeProps) {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Quick open (⌘P)"
-            className="w-full pl-8 pr-3 py-1.5 bg-[#0e1320] border border-white/[0.08] focus:border-indigo-500/50 rounded-lg text-xs text-white placeholder:text-slate-600 font-mono focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition duration-150"
+            className="w-full pl-8 pr-3 py-1.5 bg-[#0a0a0a] border border-white/[0.1] focus:border-indigo-500/50 rounded-lg text-xs text-white placeholder:text-slate-600 font-mono focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition duration-150"
           />
           {filter && (
             <button
