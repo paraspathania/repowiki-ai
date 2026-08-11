@@ -1,8 +1,16 @@
 "use client";
 
 import React from "react";
-import { ExportJob } from "@/app/repositories/[repoId]/exports/page";
 import { Download, Loader2, AlertCircle } from "lucide-react";
+
+export interface ExportJob {
+  id: string;
+  format: string;
+  status: "ready" | "pending" | "processing" | "failed";
+  created_at: string;
+  size_bytes?: number;
+  file_url?: string;
+}
 
 interface ExportHistoryListProps {
   jobs: ExportJob[];

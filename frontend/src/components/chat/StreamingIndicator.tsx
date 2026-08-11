@@ -5,45 +5,45 @@ import { Sparkles } from "lucide-react";
 
 export function StreamingIndicator() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
-      <div
-        style={{
-          padding: "16px",
-          borderRadius: "12px",
-          backgroundColor: "#1e1e2e",
-          border: "1px solid #313244",
-          borderBottomLeftRadius: "4px",
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-        }}
-      >
-        <div style={{ background: "rgba(203, 166, 247, 0.2)", padding: "4px", borderRadius: "50%" }}>
-          <Sparkles size={14} color="#cba6f7" />
+    <div className="flex justify-start w-full">
+      <div className="max-w-[85%] flex items-start gap-3">
+        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 ring-2 ring-indigo-500/30 mt-1 shadow-lg shadow-indigo-500/20 animate-pulse">
+          <Sparkles className="w-3.5 h-3.5 text-white" />
         </div>
-        
-        <div style={{ display: "flex", gap: "4px", alignItems: "center", height: "20px" }}>
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              style={{
-                width: "6px",
-                height: "6px",
-                backgroundColor: "#89b4fa",
-                borderRadius: "50%",
-                animation: `bounce 1.4s infinite ease-in-out both`,
-                animationDelay: `${i * 0.16}s`,
-              }}
-            />
-          ))}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-extrabold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              RepoWiki AI
+            </span>
+            <span className="text-[10px] text-slate-500 font-mono">is thinking...</span>
+          </div>
+          <div className="px-5 py-4 rounded-2xl rounded-tl-md bg-[#0d101a]/90 backdrop-blur-md border border-white/[0.08] shadow-xl">
+            <div className="flex items-center gap-2">
+              {/* Animated reasoning dots */}
+              <div className="flex gap-1.5 items-center">
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="w-2 h-2 rounded-full bg-indigo-400"
+                    style={{
+                      animation: `pulse-dot 1.4s infinite ease-in-out both`,
+                      animationDelay: `${i * 0.2}s`,
+                    }}
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-slate-500 ml-2 font-mono">Analyzing codebase context...</span>
+            </div>
+          </div>
         </div>
       </div>
+
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes bounce {
-          0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+        @keyframes pulse-dot {
+          0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
           40% { transform: scale(1); opacity: 1; }
         }
-      ` }} />
+      `}} />
     </div>
   );
 }

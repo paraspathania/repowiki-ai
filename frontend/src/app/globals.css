@@ -17,12 +17,47 @@
   --accent-purple: #a78bfa;
 }
 
+/* Theme presets */
+[data-theme="dark-glass"] {
+  --background: #030712;
+  --foreground: #f3f4f6;
+  --surface: #090b12;
+  --panel: rgba(17, 24, 39, 0.55);
+  --border: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="midnight-obsidian"] {
+  --background: #000000;
+  --foreground: #ffffff;
+  --surface: #0a0c10;
+  --panel: rgba(18, 18, 18, 0.95);
+  --border: rgba(16, 185, 129, 0.25);
+}
+
+[data-theme="cyberpunk-neon"] {
+  --background: #0d001a;
+  --foreground: #f8fafc;
+  --surface: #140029;
+  --panel: rgba(45, 0, 80, 0.75);
+  --border: rgba(244, 63, 94, 0.35);
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   min-height: 100vh;
   letter-spacing: -0.01em;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Custom Scrollbars */

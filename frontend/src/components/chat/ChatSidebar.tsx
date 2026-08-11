@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Plus, MessageSquare } from "lucide-react";
+import { Plus, MessageSquare, Trash2, Clock } from "lucide-react";
 
 interface Session {
   id: string;
@@ -18,62 +18,49 @@ interface ChatSidebarProps {
 
 export function ChatSidebar({ sessions, activeSessionId, onNewChat, onSelectSession }: ChatSidebarProps) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", backgroundColor: "#181825" }}>
-      <div style={{ padding: "16px" }}>
+    <div className="flex flex-col h-full bg-[#090b12]">
+      {/* New Chat CTA */}
+      <div className="p-4">
         <button
           onClick={onNewChat}
-          style={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
-            padding: "12px",
-            borderRadius: "8px",
-            background: "linear-gradient(135deg, #cba6f7 0%, #89b4fa 100%)",
-            color: "#11111b",
-            fontWeight: "bold",
-            border: "none",
-            cursor: "pointer",
-            transition: "opacity 0.2s",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+          className="w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs shadow-xl shadow-indigo-600/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
         >
-          <Plus size={18} />
-          New Chat
+          <Plus className="w-4 h-4" />
+          <span>New Thread</span>
         </button>
       </div>
-      
-      <div style={{ flex: 1, overflowY: "auto", padding: "0 16px 16px 16px", display: "flex", flexDirection: "column", gap: "8px" }}>
-        {sessions.map((session) => (
-          <div
-            key={session.id}
-            onClick={() => onSelectSession(session.id)}
-            style={{
-              padding: "12px",
-              borderRadius: "8px",
-              backgroundColor: activeSessionId === session.id ? "#313244" : "transparent",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              transition: "background-color 0.2s",
-            }}
-            onMouseEnter={(e) => { if (activeSessionId !== session.id) e.currentTarget.style.backgroundColor = "rgba(49, 50, 68, 0.5)"; }}
-            onMouseLeave={(e) => { if (activeSessionId !== session.id) e.currentTarget.style.backgroundColor = "transparent"; }}
-          >
-            <MessageSquare size={16} color={activeSessionId === session.id ? "#cba6f7" : "#a6adc8"} />
-            <div style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
-              <span style={{ color: activeSessionId === session.id ? "#cdd6f4" : "#bac2de", fontSize: "14px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                {session.title || "New conversation"}
-              </span>
-              <span style={{ color: "#6c7086", fontSize: "11px" }}>
-                {new Date(session.created_at).toLocaleDateString()}
-              </span>
-            </div>
-          </div>
-        ))}
+
+      {/* Sessions List */}
+      <div className="px-3 pb-2">
+        <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider px-2">
+          Recent Threads
+        </span>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-3 pb-4 space-y-1 no-scrollbar">
+        {sessions.map((session) => {
+          const isActive = activeSessionId === session.id;
+          return (
+            <button
+              key={session.id}
+              onClick={() => onSelectSession(session.id)}
+              className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-3 transition-all duration-150 group ${
+                isActive
+                  ? "bg-gradient-to-r from-indigo-600/25 to-purple-600/15 border border-indigo-500/40 text-white shadow-md shadow-indigo-500/10"
+                  : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
+              }`}
+            >
+              <MessageSquare className={`w-3.5 h-3.5 flex-shrink-0 ${isActive ? "text-indigo-400" : "text-slate-500 group-hover:text-slate-300"}`} />
+              <div className="flex flex-col overflow-hidden min-w-0">
+                <span className="text-xs font-semibold truncate">{session.title || "New conversation"}</span>
+                <span className="flex items-center gap-1 text-[10px] text-slate-600 mt-0.5">
+                  <Clock className="w-2.5 h-2.5" />
+                  {(() => { try { return new Date(session.created_at).toLocaleDateString(); } catch { return session.created_at; }})()}
+                </span>
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

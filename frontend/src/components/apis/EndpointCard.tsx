@@ -1,9 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
-import { Endpoint } from "@/app/repositories/[repoId]/apis/page";
 import { ChevronDown, ChevronRight, FileCode, ArrowRight } from "lucide-react";
 import Link from "next/link";
+
+export interface Endpoint {
+  id?: string;
+  method: string;
+  path: string;
+  handler_name?: string;
+  file_path?: string;
+  line_number?: number;
+}
 
 interface EndpointCardProps {
   endpoint: Endpoint;
@@ -59,7 +67,7 @@ export function EndpointCard({ endpoint, repoId }: EndpointCardProps) {
         </span>
         
         <span style={{ color: "#6c7086", fontSize: "13px", display: "flex", alignItems: "center", gap: "6px", fontFamily: "monospace" }}>
-          {endpoint.handler_name}
+          {endpoint.handler_name || "handler"}
         </span>
       </div>
 
@@ -68,21 +76,23 @@ export function EndpointCard({ endpoint, repoId }: EndpointCardProps) {
           <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px" }}>
             <span style={{ color: "#a6adc8", minWidth: "80px" }}>Handler:</span>
             <span style={{ color: "#89b4fa", fontFamily: "monospace", backgroundColor: "rgba(137, 180, 250, 0.1)", padding: "2px 6px", borderRadius: "4px" }}>
-              {endpoint.handler_name}
+              {endpoint.handler_name || "handler"}
             </span>
           </div>
           
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px" }}>
-            <span style={{ color: "#a6adc8", minWidth: "80px" }}>Source:</span>
-            <Link 
-              href={`/repositories/${repoId}/files?path=${encodeURIComponent(endpoint.file_path)}`}
-              style={{ display: "flex", alignItems: "center", gap: "6px", color: "#cba6f7", textDecoration: "none", fontFamily: "monospace" }}
-            >
-              <FileCode size={14} />
-              {endpoint.file_path} {endpoint.line_number ? `:L${endpoint.line_number}` : ""}
-              <ArrowRight size={14} style={{ marginLeft: "4px" }} />
-            </Link>
-          </div>
+          {endpoint.file_path && (
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px" }}>
+              <span style={{ color: "#a6adc8", minWidth: "80px" }}>Source:</span>
+              <Link 
+                href={`/repositories/${repoId}/files?path=${encodeURIComponent(endpoint.file_path)}`}
+                style={{ display: "flex", alignItems: "center", gap: "6px", color: "#cba6f7", textDecoration: "none", fontFamily: "monospace" }}
+              >
+                <FileCode size={14} />
+                {endpoint.file_path} {endpoint.line_number ? `:L${endpoint.line_number}` : ""}
+                <ArrowRight size={14} style={{ marginLeft: "4px" }} />
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </div>
