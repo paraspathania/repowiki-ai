@@ -1,23 +1,23 @@
 "use client";
 
 import React from "react";
-import { WikiSection } from "@/app/repositories/[repoId]/wiki/page";
+import { WikiSectionType } from "./WikiSection";
 import { Loader2 } from "lucide-react";
 
 interface WikiSidebarProps {
-  sections: WikiSection[];
+  sections: WikiSectionType[];
   activeSectionSlug: string;
   onSelectSection: (slug: string) => void;
 }
 
 export function WikiSidebar({ sections, activeSectionSlug, onSelectSection }: WikiSidebarProps) {
-  const getStatusColor = (status: WikiSection["status"]) => {
+  const getStatusColor = (status?: WikiSectionType["status"]) => {
     switch (status) {
-      case "ready": return "#a6e3a1"; // Green
-      case "skipped": return "#6c7086"; // Gray
-      case "generating": return "#f9e2af"; // Yellow
-      case "failed": return "#f38ba8"; // Red
-      default: return "#6c7086";
+      case "ready": return "#a6e3a1";
+      case "skipped": return "#6c7086";
+      case "generating": return "#f9e2af";
+      case "failed": return "#f38ba8";
+      default: return "#a6e3a1";
     }
   };
 

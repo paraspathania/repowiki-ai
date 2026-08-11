@@ -7,14 +7,19 @@ import {
   BookOpen,
   FolderTree,
   Network,
+  GitCommit,
   Server,
+  Database,
+  Package,
+  Activity,
+  ShieldAlert,
+  GraduationCap,
   MessageSquare,
   Download,
   Settings,
   HelpCircle,
   Bell,
   LogIn,
-  LogOut,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
@@ -36,29 +41,29 @@ function NavItem({ label, href, icon: Icon, isActive }: NavItemProps) {
   return (
     <Link
       href={href}
-      className={`sidebar-nav-item group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 ${
+      className={`sidebar-nav-item group relative flex items-center justify-center w-10 h-9 rounded-xl transition-all duration-200 ${
         isActive
-          ? "bg-white/[0.08] text-white shadow-sm shadow-white/[0.04]"
-          : "text-slate-500 hover:text-slate-300 hover:bg-white/[0.04]"
+          ? "bg-indigo-600/30 text-white border border-indigo-500/40 shadow-sm shadow-indigo-500/20"
+          : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.06]"
       }`}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
     >
       <Icon
-        className={`w-[18px] h-[18px] transition-colors duration-200 ${
-          isActive ? "text-white" : "text-slate-500 group-hover:text-slate-300"
+        className={`w-4 h-4 transition-colors duration-200 ${
+          isActive ? "text-indigo-400" : "text-slate-400 group-hover:text-slate-200"
         }`}
       />
       {/* Tooltip */}
       <div
-        className={`absolute left-full ml-3 px-2.5 py-1.5 bg-[#1a1d27] text-white text-[11px] font-medium rounded-lg whitespace-nowrap pointer-events-none border border-white/[0.08] shadow-xl shadow-black/40 transition-all duration-150 ${
+        className={`absolute left-full ml-3 px-2.5 py-1.5 bg-[#1a1d27] text-white text-[11px] font-medium rounded-lg whitespace-nowrap z-50 pointer-events-none border border-white/[0.1] shadow-xl shadow-black/60 transition-all duration-150 ${
           showTooltip
             ? "opacity-100 translate-x-0"
             : "opacity-0 -translate-x-1"
         }`}
       >
         {label}
-        <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1d27] border-l border-b border-white/[0.08] rotate-45" />
+        <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1d27] border-l border-b border-white/[0.1] rotate-45" />
       </div>
     </Link>
   );
@@ -80,21 +85,21 @@ function BottomNavItem({
   return (
     <button
       onClick={onClick}
-      className={`sidebar-nav-item group relative flex items-center justify-center w-10 h-10 rounded-xl text-slate-600 hover:text-slate-400 hover:bg-white/[0.04] transition-all duration-200 ${extraClass || ""}`}
+      className={`sidebar-nav-item group relative flex items-center justify-center w-10 h-9 rounded-xl text-slate-500 hover:text-slate-300 hover:bg-white/[0.04] transition-all duration-200 ${extraClass || ""}`}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
     >
-      <Icon className="w-[18px] h-[18px] transition-colors duration-200 group-hover:text-slate-400" />
+      <Icon className="w-4 h-4 transition-colors duration-200 group-hover:text-slate-300" />
       {/* Tooltip */}
       <div
-        className={`absolute left-full ml-3 px-2.5 py-1.5 bg-[#1a1d27] text-white text-[11px] font-medium rounded-lg whitespace-nowrap pointer-events-none border border-white/[0.08] shadow-xl shadow-black/40 transition-all duration-150 ${
+        className={`absolute left-full ml-3 px-2.5 py-1.5 bg-[#1a1d27] text-white text-[11px] font-medium rounded-lg whitespace-nowrap z-50 pointer-events-none border border-white/[0.1] shadow-xl shadow-black/60 transition-all duration-150 ${
           showTooltip
             ? "opacity-100 translate-x-0"
             : "opacity-0 -translate-x-1"
         }`}
       >
         {label}
-        <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1d27] border-l border-b border-white/[0.08] rotate-45" />
+        <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1d27] border-l border-b border-white/[0.1] rotate-45" />
       </div>
     </button>
   );
@@ -119,36 +124,26 @@ function UserAvatar() {
         .slice(0, 2)
     : "U";
 
-  const providerColors: Record<string, string> = {
-    google: "from-blue-500 to-red-500",
-    github: "from-gray-600 to-gray-800",
-  };
-
   return (
     <div className="flex flex-col items-center gap-1">
       <button
-        className="group relative flex items-center justify-center w-10 h-10 rounded-xl hover:bg-white/[0.04] transition-all duration-200"
+        className="group relative flex items-center justify-center w-10 h-9 rounded-xl hover:bg-white/[0.04] transition-all duration-200"
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
         onClick={signOut}
       >
-        <div
-          className={`w-7 h-7 rounded-full bg-gradient-to-br ${
-            providerColors[user?.provider || "github"]
-          } flex items-center justify-center text-[9px] font-bold text-white ring-2 ring-white/[0.1] group-hover:ring-white/[0.2] transition-all duration-200`}
-        >
+        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-[9px] font-bold text-white ring-1 ring-white/20 transition-all duration-200">
           {initials}
         </div>
-        {/* Tooltip */}
         <div
-          className={`absolute left-full ml-3 px-2.5 py-1.5 bg-[#1a1d27] text-white text-[11px] font-medium rounded-lg whitespace-nowrap pointer-events-none border border-white/[0.08] shadow-xl shadow-black/40 transition-all duration-150 ${
+          className={`absolute left-full ml-3 px-2.5 py-1.5 bg-[#1a1d27] text-white text-[11px] font-medium rounded-lg whitespace-nowrap z-50 pointer-events-none border border-white/[0.1] shadow-xl shadow-black/60 transition-all duration-150 ${
             showTooltip
               ? "opacity-100 translate-x-0"
               : "opacity-0 -translate-x-1"
           }`}
         >
           Sign Out ({user?.name})
-          <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1d27] border-l border-b border-white/[0.08] rotate-45" />
+          <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1d27] border-l border-b border-white/[0.1] rotate-45" />
         </div>
       </button>
     </div>
@@ -159,42 +154,27 @@ export function RepositorySidebar({ repoId }: RepositorySidebarProps) {
   const pathname = usePathname();
 
   const navItems = [
-    {
-      label: "Overview",
-      href: `/repositories/${repoId}/overview`,
-      icon: LayoutDashboard,
-    },
-    {
-      label: "Files",
-      href: `/repositories/${repoId}/files`,
-      icon: FolderTree,
-    },
-    {
-      label: "Architecture",
-      href: `/repositories/${repoId}/architecture`,
-      icon: Network,
-    },
+    { label: "Overview", href: `/repositories/${repoId}/overview`, icon: LayoutDashboard },
     { label: "Wiki", href: `/repositories/${repoId}/wiki`, icon: BookOpen },
-    { label: "APIs", href: `/repositories/${repoId}/apis`, icon: Server },
-    {
-      label: "AI Chat",
-      href: `/repositories/${repoId}/chat`,
-      icon: MessageSquare,
-    },
-    {
-      label: "Exports",
-      href: `/repositories/${repoId}/exports`,
-      icon: Download,
-    },
+    { label: "Files Explorer", href: `/repositories/${repoId}/files`, icon: FolderTree },
+    { label: "Architecture", href: `/repositories/${repoId}/architecture`, icon: Network },
+    { label: "Code Flow", href: `/repositories/${repoId}/code-flow`, icon: GitCommit },
+    { label: "APIs Hub", href: `/repositories/${repoId}/apis`, icon: Server },
+    { label: "Database ERD", href: `/repositories/${repoId}/database`, icon: Database },
+    { label: "Dependencies", href: `/repositories/${repoId}/dependencies`, icon: Package },
+    { label: "Insights & Refactor", href: `/repositories/${repoId}/insights`, icon: Activity },
+    { label: "Security Audit", href: `/repositories/${repoId}/security`, icon: ShieldAlert },
+    { label: "Learning Engine", href: `/repositories/${repoId}/learning`, icon: GraduationCap },
+    { label: "Grounded AI Chat", href: `/repositories/${repoId}/chat`, icon: MessageSquare },
+    { label: "Exports", href: `/repositories/${repoId}/exports`, icon: Download },
   ];
 
   return (
-    <aside className="w-[52px] bg-[#0a0c14] border-r border-white/[0.06] flex flex-col items-center py-4 justify-between flex-shrink-0">
+    <aside className="w-[54px] bg-[#090b11] border-r border-white/[0.08] flex flex-col items-center py-3 justify-between flex-shrink-0 z-30">
       {/* Top nav icons */}
-      <div className="flex flex-col items-center gap-1">
+      <div className="flex flex-col items-center gap-1.5 overflow-y-auto max-h-[calc(100vh-140px)] no-scrollbar py-1">
         {navItems.map((item) => {
-          const isActive =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (
             <NavItem
               key={item.href}
@@ -208,11 +188,10 @@ export function RepositorySidebar({ repoId }: RepositorySidebarProps) {
       </div>
 
       {/* Bottom utility icons */}
-      <div className="flex flex-col items-center gap-1">
+      <div className="flex flex-col items-center gap-1 pt-2 border-t border-white/[0.06] w-full">
         <BottomNavItem icon={Bell} label="Notifications" />
-        <BottomNavItem icon={HelpCircle} label="Help" />
+        <BottomNavItem icon={HelpCircle} label="Help & Docs" />
         <BottomNavItem icon={Settings} label="Settings" />
-        <div className="w-6 h-px bg-white/[0.08] my-1" />
         <UserAvatar />
       </div>
     </aside>
