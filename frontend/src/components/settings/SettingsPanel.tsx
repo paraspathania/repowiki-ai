@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSettings, WebsiteTheme, ExplanationMode } from "@/lib/settings-context";
 import {
   Settings,
   Globe,
@@ -8,13 +9,8 @@ import {
   Shield,
   FileText,
   Bell,
-  Users,
   Save,
   Check,
-  Sparkles,
-  Lock,
-  Eye,
-  Sliders,
 } from "lucide-react";
 
 interface SettingsPanelProps {
@@ -22,22 +18,9 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ repoId }: SettingsPanelProps) {
+  const { settings, updateSettings } = useSettings();
   const [activeTab, setActiveTab] = useState<"general" | "ai" | "security" | "exports" | "integrations">("general");
-
-  // Form State
   const [saved, setSaved] = useState<boolean>(false);
-  const [theme, setTheme] = useState<string>("dark-glass");
-  const [defaultBranch, setDefaultBranch] = useState<string>("main");
-  const [autoReanalyze, setAutoReanalyze] = useState<boolean>(true);
-  const [aiModel, setAiModel] = useState<string>("gemini-1.5-pro");
-  const [explanationMode, setExplanationMode] = useState<string>("intermediate");
-  const [ragDepth, setRagDepth] = useState<number>(5);
-  const [temperature, setTemperature] = useState<number>(0.2);
-  const [secretMasking, setSecretMasking] = useState<boolean>(true);
-  const [saifAudit, setSaifAudit] = useState<boolean>(true);
-  const [pdfTheme, setPdfTheme] = useState<string>("midnight");
-  const [publicShare, setPublicShare] = useState<boolean>(true);
-  const [slackWebhook, setSlackWebhook] = useState<string>("https://hooks.slack.com/services/T00/B00/X00");
 
   const handleSaveSettings = () => {
     setSaved(true);
@@ -47,7 +30,7 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       {/* Top Banner */}
-      <div className="bg-[#090b12] p-6 rounded-2xl border border-white/[0.08] flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-surface p-6 rounded-2xl border border-white/[0.08] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
             <Settings className="w-5 h-5" />
@@ -86,7 +69,7 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
       {/* Main Settings Grid */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* Left Sub-Tab Navigation */}
-        <div className="md:col-span-3 bg-[#090b12] border border-white/[0.08] rounded-2xl p-3 space-y-1 h-fit">
+        <div className="md:col-span-3 bg-surface border border-white/[0.08] rounded-2xl p-3 space-y-1 h-fit shadow-lg">
           <button
             onClick={() => setActiveTab("general")}
             className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition ${
@@ -149,35 +132,38 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
         </div>
 
         {/* Right Settings Content */}
-        <div className="md:col-span-9 bg-[#090b12] border border-white/[0.08] rounded-2xl p-6 space-y-6">
+        <div className="md:col-span-9 bg-surface border border-white/[0.08] rounded-2xl p-6 space-y-6 shadow-xl">
           {/* GENERAL TAB */}
           {activeTab === "general" && (
             <div className="space-y-6 animate-fade-in">
               <div>
                 <h3 className="text-sm font-bold text-white tracking-tight">General Website Preferences</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Customize appearance, branch synchronization, and landing page behavior.</p>
+                <p className="text-xs text-slate-400 mt-0.5">Customize appearance, branch synchronization, and website themes.</p>
               </div>
 
               <div className="space-y-4 text-xs">
                 <div className="space-y-1.5">
                   <label className="block text-slate-300 font-semibold">Website Theme</label>
                   <select
-                    value={theme}
-                    onChange={(e) => setTheme(e.target.value)}
-                    className="w-full p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white focus:outline-none focus:border-indigo-500"
+                    value={settings.theme}
+                    onChange={(e) => updateSettings({ theme: e.target.value as WebsiteTheme })}
+                    className="w-full p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white focus:outline-none focus:border-indigo-500 font-medium"
                   >
                     <option value="dark-glass" className="bg-[#141722]">Dark Futuristic Glassmorphism (Default)</option>
                     <option value="midnight-obsidian" className="bg-[#141722]">Midnight Obsidian Dark</option>
                     <option value="cyberpunk-neon" className="bg-[#141722]">Cyberpunk Neon Contrast</option>
                   </select>
+                  <span className="text-[10px] text-indigo-400 block pt-0.5 font-mono">
+                    Active Theme: {settings.theme === "dark-glass" ? "Indigo Glassmorphism" : settings.theme === "midnight-obsidian" ? "Pure Obsidian Pitch Black" : "Cyberpunk Neon Violet"}
+                  </span>
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="block text-slate-300 font-semibold">Default Repository Branch</label>
                   <input
                     type="text"
-                    value={defaultBranch}
-                    onChange={(e) => setDefaultBranch(e.target.value)}
+                    value={settings.defaultBranch}
+                    onChange={(e) => updateSettings({ defaultBranch: e.target.value })}
                     className="w-full p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white font-mono focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -189,8 +175,8 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
                   </div>
                   <input
                     type="checkbox"
-                    checked={autoReanalyze}
-                    onChange={(e) => setAutoReanalyze(e.target.checked)}
+                    checked={settings.autoReanalyze}
+                    onChange={(e) => updateSettings({ autoReanalyze: e.target.checked })}
                     className="w-4 h-4 accent-indigo-500 rounded cursor-pointer"
                   />
                 </div>
@@ -210,9 +196,9 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
                 <div className="space-y-1.5">
                   <label className="block text-slate-300 font-semibold">Primary LLM Provider Model</label>
                   <select
-                    value={aiModel}
-                    onChange={(e) => setAiModel(e.target.value)}
-                    className="w-full p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white focus:outline-none focus:border-indigo-500"
+                    value={settings.aiModel}
+                    onChange={(e) => updateSettings({ aiModel: e.target.value })}
+                    className="w-full p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white focus:outline-none focus:border-indigo-500 font-medium"
                   >
                     <option value="gemini-1.5-pro" className="bg-[#141722]">Gemini 1.5 Pro (Recommended for Complex AST)</option>
                     <option value="gemini-1.5-flash" className="bg-[#141722]">Gemini 1.5 Flash (Ultra Low Latency)</option>
@@ -223,9 +209,9 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
                 <div className="space-y-1.5">
                   <label className="block text-slate-300 font-semibold">Default Explanation Mode</label>
                   <select
-                    value={explanationMode}
-                    onChange={(e) => setExplanationMode(e.target.value)}
-                    className="w-full p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white focus:outline-none focus:border-indigo-500"
+                    value={settings.explanationMode}
+                    onChange={(e) => updateSettings({ explanationMode: e.target.value as ExplanationMode })}
+                    className="w-full p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white focus:outline-none focus:border-indigo-500 font-medium"
                   >
                     <option value="beginner" className="bg-[#141722]">Beginner (ELI10 Analogies)</option>
                     <option value="intermediate" className="bg-[#141722]">Intermediate (Standard Developer Flow)</option>
@@ -236,14 +222,14 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
                 <div className="space-y-1.5">
                   <div className="flex justify-between">
                     <label className="block text-slate-300 font-semibold">RAG Retrieval Depth (Top-k Snippets)</label>
-                    <span className="font-mono text-indigo-400 font-bold">{ragDepth} Chunks</span>
+                    <span className="font-mono text-indigo-400 font-bold">{settings.ragDepth} Chunks</span>
                   </div>
                   <input
                     type="range"
                     min="2"
                     max="10"
-                    value={ragDepth}
-                    onChange={(e) => setRagDepth(parseInt(e.target.value))}
+                    value={settings.ragDepth}
+                    onChange={(e) => updateSettings({ ragDepth: parseInt(e.target.value) })}
                     className="w-full accent-indigo-500 cursor-pointer"
                   />
                 </div>
@@ -251,15 +237,15 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
                 <div className="space-y-1.5">
                   <div className="flex justify-between">
                     <label className="block text-slate-300 font-semibold">LLM Prompt Temperature</label>
-                    <span className="font-mono text-indigo-400 font-bold">{temperature}</span>
+                    <span className="font-mono text-indigo-400 font-bold">{settings.temperature}</span>
                   </div>
                   <input
                     type="range"
                     min="0"
                     max="1"
                     step="0.05"
-                    value={temperature}
-                    onChange={(e) => setTemperature(parseFloat(e.target.value))}
+                    value={settings.temperature}
+                    onChange={(e) => updateSettings({ temperature: parseFloat(e.target.value) })}
                     className="w-full accent-indigo-500 cursor-pointer"
                   />
                   <span className="text-[10px] text-slate-500">Lower values yield deterministic technical facts; higher values produce creative refactorings.</span>
@@ -284,8 +270,8 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
                   </div>
                   <input
                     type="checkbox"
-                    checked={secretMasking}
-                    onChange={(e) => setSecretMasking(e.target.checked)}
+                    checked={settings.secretMasking}
+                    onChange={(e) => updateSettings({ secretMasking: e.target.checked })}
                     className="w-4 h-4 accent-indigo-500 rounded cursor-pointer"
                   />
                 </div>
@@ -297,8 +283,8 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
                   </div>
                   <input
                     type="checkbox"
-                    checked={saifAudit}
-                    onChange={(e) => setSaifAudit(e.target.checked)}
+                    checked={settings.saifAudit}
+                    onChange={(e) => updateSettings({ saifAudit: e.target.checked })}
                     className="w-4 h-4 accent-indigo-500 rounded cursor-pointer"
                   />
                 </div>
@@ -318,9 +304,9 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
                 <div className="space-y-1.5">
                   <label className="block text-slate-300 font-semibold">PDF Document Theme</label>
                   <select
-                    value={pdfTheme}
-                    onChange={(e) => setPdfTheme(e.target.value)}
-                    className="w-full p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white focus:outline-none focus:border-indigo-500"
+                    value={settings.pdfTheme}
+                    onChange={(e) => updateSettings({ pdfTheme: e.target.value })}
+                    className="w-full p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white focus:outline-none focus:border-indigo-500 font-medium"
                   >
                     <option value="midnight" className="bg-[#141722]">Midnight Dark Publication (Default)</option>
                     <option value="minimalist" className="bg-[#141722]">Minimalist Clean White</option>
@@ -347,8 +333,8 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
                   </div>
                   <input
                     type="checkbox"
-                    checked={publicShare}
-                    onChange={(e) => setPublicShare(e.target.checked)}
+                    checked={settings.publicShare}
+                    onChange={(e) => updateSettings({ publicShare: e.target.checked })}
                     className="w-4 h-4 accent-indigo-500 rounded cursor-pointer"
                   />
                 </div>
@@ -357,8 +343,8 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
                   <label className="block text-slate-300 font-semibold">Slack Webhook URL</label>
                   <input
                     type="text"
-                    value={slackWebhook}
-                    onChange={(e) => setSlackWebhook(e.target.value)}
+                    value={settings.slackWebhook}
+                    onChange={(e) => updateSettings({ slackWebhook: e.target.value })}
                     className="w-full p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] text-white font-mono focus:outline-none focus:border-indigo-500"
                   />
                 </div>
