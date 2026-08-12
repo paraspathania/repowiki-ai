@@ -159,10 +159,10 @@ export function Hero3DShowcase() {
   const baseScrollScale = 0.88 + 0.12 * scrollProgress;
   const baseScrollOpacity = 0.5 + 0.5 * scrollProgress;
 
-  // Add mouse interactive offsets
-  const rotateX = isHovered ? baseScrollRotateX - mousePos.y * 10 : baseScrollRotateX;
-  const rotateY = isHovered ? mousePos.x * 12 : -2 * (1 - scrollProgress);
-  const finalScale = baseScrollScale * (isHovered ? 1.015 : 1);
+  // Stable on cursor hover (GitHub behavior: box flattens upright & locks solid when cursor is inside)
+  const rotateX = isHovered ? 0 : baseScrollRotateX;
+  const rotateY = isHovered ? 0 : -2 * (1 - scrollProgress);
+  const finalScale = isHovered ? 1.0 : baseScrollScale;
 
   const glowX = (mousePos.x + 1) * 50;
   const glowY = (mousePos.y + 1) * 50;
@@ -189,9 +189,9 @@ export function Hero3DShowcase() {
           }}
         />
 
-        {/* Outer 3D Card Shell with Scroll-Driven Perspective */}
+        {/* Outer Card Shell (Locks completely stable on cursor hover) */}
         <div
-          className="hero-3d-card relative rounded-2xl border border-white/10 bg-[#090b10] shadow-[0_30px_100px_-20px_rgba(79,70,229,0.35)] overflow-hidden transition-transform duration-100 ease-out"
+          className="hero-3d-card relative rounded-2xl border border-white/10 bg-[#090b10] shadow-[0_30px_100px_-20px_rgba(79,70,229,0.35)] overflow-hidden transition-all duration-300 cubic-bezier(0.16,1,0.3,1)"
           style={{
             transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(${finalScale}, ${finalScale}, 1)`,
           }}
