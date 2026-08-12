@@ -116,21 +116,20 @@ export function Hero3DShowcase() {
   const [selectedWikiPage, setSelectedWikiPage] = useState<string>("overview");
   const [selectedApiRoute, setSelectedApiRoute] = useState<string>("GET /api/v1/repos/{id}/wiki");
 
-  // Smooth 60fps RAF scroll physics loop (freezes rock-solid when hovered)
+  const physicsRef = useRef({ rotX: 0, rotY: 0, scale: 1, opacity: 1 });
+
+  // Smooth 60fps RAF scroll physics loop (zero snapping when cursor leaves box)
   useEffect(() => {
     let animationFrameId: number;
-    let currentRotX = 24;
-    let currentRotY = 0;
-    let currentScale = 0.88;
-    let currentOpacity = 0.5;
 
     const updatePhysics = () => {
       if (containerRef.current && cardRef.current) {
-        if (isHovered) {
-          // Lock completely stable with zero shaking/movement on hover
-          cardRef.current.style.transform = "perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1) translateZ(0)";
-          containerRef.current.style.opacity = "1";
-        } else {
+        let targetRotX = 0;
+        let targetRotY = 0;
+        let targetScale = 1;
+        let targetOpacity = 1;
+
+        if (!isHovered) {
           const rect = containerRef.current.getBoundingClientRect();
           const windowHeight = window.innerHeight;
           
@@ -141,21 +140,22 @@ export function Hero3DShowcase() {
           const rawRatio = (startTrigger - elementTop) / (startTrigger - targetTrigger);
           const clampedRatio = Math.min(Math.max(rawRatio, 0), 1);
 
-          const targetRotX = 24 * (1 - clampedRatio);
-          const targetRotY = -2 * (1 - clampedRatio);
-          const targetScale = 0.88 + 0.12 * clampedRatio;
-          const targetOpacity = 0.5 + 0.5 * clampedRatio;
-
-          // Smooth Linear Interpolation (LERP)
-          const lerpFactor = 0.08;
-          currentRotX += (targetRotX - currentRotX) * lerpFactor;
-          currentRotY += (targetRotY - currentRotY) * lerpFactor;
-          currentScale += (targetScale - currentScale) * lerpFactor;
-          currentOpacity += (targetOpacity - currentOpacity) * lerpFactor;
-
-          cardRef.current.style.transform = `perspective(1200px) rotateX(${currentRotX.toFixed(2)}deg) rotateY(${currentRotY.toFixed(2)}deg) scale3d(${currentScale.toFixed(3)}, ${currentScale.toFixed(3)}, 1) translateZ(0)`;
-          containerRef.current.style.opacity = currentOpacity.toFixed(2);
+          targetRotX = 18 * (1 - clampedRatio);
+          targetRotY = -2 * (1 - clampedRatio);
+          targetScale = 0.92 + 0.08 * clampedRatio;
+          targetOpacity = 0.6 + 0.4 * clampedRatio;
         }
+
+        // LERP interpolation continuously using physicsRef to prevent any snap/shake on hover exit
+        const physics = physicsRef.current;
+        const lerpFactor = 0.08;
+        physics.rotX += (targetRotX - physics.rotX) * lerpFactor;
+        physics.rotY += (targetRotY - physics.rotY) * lerpFactor;
+        physics.scale += (targetScale - physics.scale) * lerpFactor;
+        physics.opacity += (targetOpacity - physics.opacity) * lerpFactor;
+
+        cardRef.current.style.transform = `perspective(1200px) rotateX(${physics.rotX.toFixed(2)}deg) rotateY(${physics.rotY.toFixed(2)}deg) scale3d(${physics.scale.toFixed(3)}, ${physics.scale.toFixed(3)}, 1) translateZ(0)`;
+        containerRef.current.style.opacity = physics.opacity.toFixed(2);
       }
 
       animationFrameId = requestAnimationFrame(updatePhysics);
