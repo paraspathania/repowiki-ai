@@ -42,6 +42,10 @@
   --border: rgba(244, 63, 94, 0.4);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   color: var(--foreground);
   background-color: #000000 !important;
@@ -50,6 +54,7 @@ body {
   min-height: 100vh;
   letter-spacing: -0.01em;
   transition: background-color 0.2s ease, color 0.2s ease;
+  overflow-x: hidden;
 }
 
 /* Global No Blur / Solid High-Contrast Overrides */

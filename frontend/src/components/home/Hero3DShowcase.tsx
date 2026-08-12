@@ -77,7 +77,33 @@ export function Hero3DShowcase() {
   const [progress, setProgress] = useState<number>(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [scrollProgress, setScrollProgress] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll-driven 3D perspective calculation matching GitHub hero
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      // Calculate how far the component has scrolled into the viewport (0 to 1)
+      const elementTop = rect.top;
+      const elementHeight = rect.height;
+      const startTrigger = windowHeight; // enters bottom of screen
+      const targetTrigger = windowHeight * 0.25; // aligns in upper-center
+
+      const rawRatio = (startTrigger - elementTop) / (startTrigger - targetTrigger);
+      const clampedRatio = Math.min(Math.max(rawRatio, 0), 1);
+      
+      setScrollProgress(clampedRatio);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // Initial check
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Auto-play timer loop
   useEffect(() => {
@@ -127,9 +153,17 @@ export function Hero3DShowcase() {
     setMousePos({ x: 0, y: 0 });
   };
 
-  // Calculate 3D rotations based on mouse cursor position
-  const rotateX = isHovered ? -mousePos.y * 12 : 5; // Default tilt upward slightly
-  const rotateY = isHovered ? mousePos.x * 12 : -3;  // Default slight angle
+  // 3D Scroll Tilt Physics (GitHub signature effect):
+  // Starts at 24deg tilted backwards when scrolling into view, levels to 0deg as centered
+  const baseScrollRotateX = 24 * (1 - scrollProgress); 
+  const baseScrollScale = 0.88 + 0.12 * scrollProgress;
+  const baseScrollOpacity = 0.5 + 0.5 * scrollProgress;
+
+  // Add mouse interactive offsets
+  const rotateX = isHovered ? baseScrollRotateX - mousePos.y * 10 : baseScrollRotateX;
+  const rotateY = isHovered ? mousePos.x * 12 : -2 * (1 - scrollProgress);
+  const finalScale = baseScrollScale * (isHovered ? 1.015 : 1);
+
   const glowX = (mousePos.x + 1) * 50;
   const glowY = (mousePos.y + 1) * 50;
 
@@ -142,6 +176,10 @@ export function Hero3DShowcase() {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         className="perspective-container relative group cursor-pointer"
+        style={{
+          opacity: baseScrollOpacity,
+          transition: "opacity 0.3s ease-out",
+        }}
       >
         {/* Ambient Glowing Aura Behind Card */}
         <div
@@ -151,11 +189,11 @@ export function Hero3DShowcase() {
           }}
         />
 
-        {/* Outer 3D Card Shell */}
+        {/* Outer 3D Card Shell with Scroll-Driven Perspective */}
         <div
-          className="hero-3d-card relative rounded-2xl border border-white/10 bg-[#090b10] shadow-[0_30px_100px_-20px_rgba(79,70,229,0.35)] overflow-hidden transition-all duration-200"
+          className="hero-3d-card relative rounded-2xl border border-white/10 bg-[#090b10] shadow-[0_30px_100px_-20px_rgba(79,70,229,0.35)] overflow-hidden transition-transform duration-100 ease-out"
           style={{
-            transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(${isHovered ? 1.015 : 1}, ${isHovered ? 1.015 : 1}, 1)`,
+            transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(${finalScale}, ${finalScale}, 1)`,
           }}
         >
           {/* Top Metallic Border Highlight */}
