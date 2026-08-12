@@ -104,63 +104,58 @@ export function Hero3DShowcase() {
   const [activeMode, setActiveMode] = useState<Mode>("code");
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [progress, setProgress] = useState<number>(0);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
 
   // Sub-tab selection state inside showcase tabs
   const [selectedFile, setSelectedFile] = useState<string>("auth-context.tsx");
   const [selectedWikiPage, setSelectedWikiPage] = useState<string>("overview");
   const [selectedApiRoute, setSelectedApiRoute] = useState<string>("GET /api/v1/repos/{id}/wiki");
 
-  // High-performance RAF scroll & LERP animation loop (60fps / 120fps smooth scrolling)
+  // Smooth 60fps RAF scroll physics loop (freezes rock-solid when hovered)
   useEffect(() => {
     let animationFrameId: number;
     let currentRotX = 24;
-    let targetRotX = 24;
     let currentRotY = 0;
-    let targetRotY = 0;
     let currentScale = 0.88;
-    let targetScale = 0.88;
     let currentOpacity = 0.5;
-    let targetOpacity = 0.5;
 
     const updatePhysics = () => {
       if (containerRef.current && cardRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        
-        const elementTop = rect.top;
-        const startTrigger = windowHeight;
-        const targetTrigger = windowHeight * 0.2;
-
-        const rawRatio = (startTrigger - elementTop) / (startTrigger - targetTrigger);
-        const clampedRatio = Math.min(Math.max(rawRatio, 0), 1);
-
         if (isHovered) {
-          targetRotX = 0;
-          targetRotY = 0;
-          targetScale = 1.0;
-          targetOpacity = 1.0;
+          // Lock completely stable with zero shaking/movement on hover
+          cardRef.current.style.transform = "perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1) translateZ(0)";
+          containerRef.current.style.opacity = "1";
         } else {
-          targetRotX = 24 * (1 - clampedRatio);
-          targetRotY = -2 * (1 - clampedRatio);
-          targetScale = 0.88 + 0.12 * clampedRatio;
-          targetOpacity = 0.5 + 0.5 * clampedRatio;
+          const rect = containerRef.current.getBoundingClientRect();
+          const windowHeight = window.innerHeight;
+          
+          const elementTop = rect.top;
+          const startTrigger = windowHeight;
+          const targetTrigger = windowHeight * 0.2;
+
+          const rawRatio = (startTrigger - elementTop) / (startTrigger - targetTrigger);
+          const clampedRatio = Math.min(Math.max(rawRatio, 0), 1);
+
+          const targetRotX = 24 * (1 - clampedRatio);
+          const targetRotY = -2 * (1 - clampedRatio);
+          const targetScale = 0.88 + 0.12 * clampedRatio;
+          const targetOpacity = 0.5 + 0.5 * clampedRatio;
+
+          // Smooth Linear Interpolation (LERP)
+          const lerpFactor = 0.08;
+          currentRotX += (targetRotX - currentRotX) * lerpFactor;
+          currentRotY += (targetRotY - currentRotY) * lerpFactor;
+          currentScale += (targetScale - currentScale) * lerpFactor;
+          currentOpacity += (targetOpacity - currentOpacity) * lerpFactor;
+
+          cardRef.current.style.transform = `perspective(1200px) rotateX(${currentRotX.toFixed(2)}deg) rotateY(${currentRotY.toFixed(2)}deg) scale3d(${currentScale.toFixed(3)}, ${currentScale.toFixed(3)}, 1) translateZ(0)`;
+          containerRef.current.style.opacity = currentOpacity.toFixed(2);
         }
-
-        // Linear interpolation (LERP) for ultra-smooth motion
-        const lerpFactor = isHovered ? 0.15 : 0.08;
-        currentRotX += (targetRotX - currentRotX) * lerpFactor;
-        currentRotY += (targetRotY - currentRotY) * lerpFactor;
-        currentScale += (targetScale - currentScale) * lerpFactor;
-        currentOpacity += (targetOpacity - currentOpacity) * lerpFactor;
-
-        cardRef.current.style.transform = `perspective(1200px) rotateX(${currentRotX.toFixed(2)}deg) rotateY(${currentRotY.toFixed(2)}deg) scale3d(${currentScale.toFixed(3)}, ${currentScale.toFixed(3)}, 1) translateZ(0)`;
-        containerRef.current.style.opacity = currentOpacity.toFixed(2);
       }
 
       animationFrameId = requestAnimationFrame(updatePhysics);
@@ -199,32 +194,24 @@ export function Hero3DShowcase() {
     setProgress(0);
   };
 
+  // Direct ref DOM update for glow tracking — zero React re-renders, zero shaking
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
+    if (!glowRef.current || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
+    const glowX = ((e.clientX - rect.left) / rect.width) * 100;
+    const glowY = ((e.clientY - rect.top) / rect.height) * 100;
     
-    const normX = (e.clientX - centerX) / (rect.width / 2);
-    const normY = (e.clientY - centerY) / (rect.height / 2);
-    
-    setMousePos({ x: normX, y: normY });
+    glowRef.current.style.background = `radial-gradient(circle at ${glowX.toFixed(1)}% ${glowY.toFixed(1)}%, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.08), transparent 70%)`;
   };
 
   const handleMouseEnter = () => setIsHovered(true);
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    setMousePos({ x: 0, y: 0 });
-  };
+  const handleMouseLeave = () => setIsHovered(false);
 
   const handleCopyCode = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  const glowX = (mousePos.x + 1) * 50;
-  const glowY = (mousePos.y + 1) * 50;
 
   return (
     <div className="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6">
@@ -239,9 +226,10 @@ export function Hero3DShowcase() {
       >
         {/* Ambient Glow */}
         <div
+          ref={glowRef}
           className="absolute -inset-4 rounded-3xl opacity-50 transition-opacity duration-500 blur-3xl pointer-events-none animate-pulse-glow"
           style={{
-            background: `radial-gradient(circle at ${glowX}% ${glowY}%, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.08), transparent 70%)`,
+            background: `radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.08), transparent 70%)`,
           }}
         />
 
