@@ -215,26 +215,26 @@ export function Hero3DShowcase() {
           transition: "opacity 0.3s ease-out",
         }}
       >
-        {/* Ambient Glowing Aura */}
+        {/* Ambient Glow */}
         <div
-          className="absolute -inset-4 rounded-3xl opacity-60 transition-opacity duration-500 blur-3xl pointer-events-none animate-pulse-glow"
+          className="absolute -inset-4 rounded-3xl opacity-50 transition-opacity duration-500 blur-3xl pointer-events-none animate-pulse-glow"
           style={{
-            background: `radial-gradient(circle at ${glowX}% ${glowY}%, rgba(129, 140, 248, 0.4), rgba(168, 85, 247, 0.25), rgba(16, 185, 129, 0.15), transparent 70%)`,
+            background: `radial-gradient(circle at ${glowX}% ${glowY}%, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.08), transparent 70%)`,
           }}
         />
 
-        {/* Outer Showcase Window (Locks stable on cursor hover) */}
+        {/* Outer Showcase Window (GitHub #0d1117 Dark Obsidian Shell) */}
         <div
-          className="hero-3d-card relative rounded-2xl border border-white/10 bg-[#090b10] shadow-[0_30px_100px_-20px_rgba(79,70,229,0.35)] overflow-hidden transition-all duration-300 cubic-bezier(0.16,1,0.3,1)"
+          className="hero-3d-card relative rounded-2xl border border-[#30363d] bg-[#0d1117] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.85)] overflow-hidden transition-all duration-300 cubic-bezier(0.16,1,0.3,1)"
           style={{
             transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(${finalScale}, ${finalScale}, 1)`,
           }}
         >
           {/* Metallic Top Border Highlight */}
-          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-indigo-400/60 to-transparent z-30" />
+          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[#58a6ff]/50 to-transparent z-30" />
 
           {/* Window Header Bar */}
-          <div className="flex items-center justify-between px-4 py-3 bg-[#0d1017] border-b border-white/[0.08] relative z-20">
+          <div className="flex items-center justify-between px-4 py-3 bg-[#161b22] border-b border-[#30363d] relative z-20">
             {/* macOS Style Window Controls */}
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]/40 shadow-sm" />
@@ -242,17 +242,17 @@ export function Hero3DShowcase() {
               <div className="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29]/40 shadow-sm" />
               
               <span className="ml-3 text-xs font-semibold text-slate-300 flex items-center gap-1.5 font-mono">
-                <Terminal className="w-3.5 h-3.5 text-indigo-400" />
+                <Terminal className="w-3.5 h-3.5 text-[#58a6ff]" />
                 paraspathania / repowiki-ai
               </span>
             </div>
 
             {/* Middle Live Status Pill */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-white/[0.04] border border-white/[0.08] rounded-full text-xs text-slate-300 font-mono">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-[#21262d] border border-[#30363d] rounded-full text-xs text-slate-300 font-mono">
+              <span className="w-2 h-2 rounded-full bg-[#3fb950] animate-ping" />
               <span>LIVE REPOSITORY PLATFORM</span>
               <span className="text-slate-500">|</span>
-              <span className="text-indigo-400 font-semibold">{MODES.find(m => m.id === activeMode)?.fileName}</span>
+              <span className="text-[#58a6ff] font-semibold">{MODES.find(m => m.id === activeMode)?.fileName}</span>
             </div>
 
             {/* Playback Controls */}
@@ -784,9 +784,9 @@ export function Hero3DShowcase() {
           </div>
 
           {/* Bottom Progress Bar */}
-          <div className="w-full bg-slate-950 h-1 relative overflow-hidden">
+          <div className="w-full bg-[#161b22] h-1 relative overflow-hidden border-t border-[#30363d]">
             <div
-              className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 transition-all duration-100 ease-linear"
+              className="h-full bg-[#58a6ff] transition-all duration-100 ease-linear"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -794,7 +794,7 @@ export function Hero3DShowcase() {
 
         {/* Bottom Interactive Feature Tab Bar */}
         <div className="mt-8 flex justify-center">
-          <div className="inline-flex items-center gap-1 sm:gap-2 p-1.5 bg-[#0d1017]/90 border border-white/10 rounded-full backdrop-blur-xl shadow-2xl max-w-full overflow-x-auto no-scrollbar">
+          <div className="inline-flex items-center gap-1 sm:gap-2 p-1.5 bg-[#0d1117] border border-[#30363d] rounded-full shadow-2xl max-w-full overflow-x-auto no-scrollbar">
             {MODES.map((mode) => {
               const Icon = mode.icon;
               const isActive = activeMode === mode.id;
@@ -802,13 +802,13 @@ export function Hero3DShowcase() {
                 <button
                   key={mode.id}
                   onClick={() => handleModeSelect(mode.id)}
-                  className={`px-3.5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center gap-2 whitespace-nowrap ${
+                  className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2.5 whitespace-nowrap ${
                     isActive
-                      ? "bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 border border-indigo-400/40 scale-105"
-                      : "text-slate-400 hover:text-white hover:bg-white/[0.06]"
+                      ? "bg-[#21262d] text-white border border-[#484f58] shadow-md"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-[#161b22]"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? "text-white" : "text-slate-400"}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? "text-blue-400" : "text-slate-500"}`} />
                   <span>{mode.label}</span>
                 </button>
               );
