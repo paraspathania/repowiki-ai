@@ -106,37 +106,72 @@ export function Hero3DShowcase() {
   const [progress, setProgress] = useState<number>(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [copied, setCopied] = useState<boolean>(false);
+  
   const containerRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // Sub-tab selection state inside showcase tabs
   const [selectedFile, setSelectedFile] = useState<string>("auth-context.tsx");
   const [selectedWikiPage, setSelectedWikiPage] = useState<string>("overview");
   const [selectedApiRoute, setSelectedApiRoute] = useState<string>("GET /api/v1/repos/{id}/wiki");
 
-  // Scroll-driven 3D perspective calculation
+  // High-performance RAF scroll & LERP animation loop (60fps / 120fps smooth scrolling)
   useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      
-      const elementTop = rect.top;
-      const startTrigger = windowHeight;
-      const targetTrigger = windowHeight * 0.25;
+    let animationFrameId: number;
+    let currentRotX = 24;
+    let targetRotX = 24;
+    let currentRotY = 0;
+    let targetRotY = 0;
+    let currentScale = 0.88;
+    let targetScale = 0.88;
+    let currentOpacity = 0.5;
+    let targetOpacity = 0.5;
 
-      const rawRatio = (startTrigger - elementTop) / (startTrigger - targetTrigger);
-      const clampedRatio = Math.min(Math.max(rawRatio, 0), 1);
-      
-      setScrollProgress(clampedRatio);
+    const updatePhysics = () => {
+      if (containerRef.current && cardRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        
+        const elementTop = rect.top;
+        const startTrigger = windowHeight;
+        const targetTrigger = windowHeight * 0.2;
+
+        const rawRatio = (startTrigger - elementTop) / (startTrigger - targetTrigger);
+        const clampedRatio = Math.min(Math.max(rawRatio, 0), 1);
+
+        if (isHovered) {
+          targetRotX = 0;
+          targetRotY = 0;
+          targetScale = 1.0;
+          targetOpacity = 1.0;
+        } else {
+          targetRotX = 24 * (1 - clampedRatio);
+          targetRotY = -2 * (1 - clampedRatio);
+          targetScale = 0.88 + 0.12 * clampedRatio;
+          targetOpacity = 0.5 + 0.5 * clampedRatio;
+        }
+
+        // Linear interpolation (LERP) for ultra-smooth motion
+        const lerpFactor = isHovered ? 0.15 : 0.08;
+        currentRotX += (targetRotX - currentRotX) * lerpFactor;
+        currentRotY += (targetRotY - currentRotY) * lerpFactor;
+        currentScale += (targetScale - currentScale) * lerpFactor;
+        currentOpacity += (targetOpacity - currentOpacity) * lerpFactor;
+
+        cardRef.current.style.transform = `perspective(1200px) rotateX(${currentRotX.toFixed(2)}deg) rotateY(${currentRotY.toFixed(2)}deg) scale3d(${currentScale.toFixed(3)}, ${currentScale.toFixed(3)}, 1) translateZ(0)`;
+        containerRef.current.style.opacity = currentOpacity.toFixed(2);
+      }
+
+      animationFrameId = requestAnimationFrame(updatePhysics);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
+    animationFrameId = requestAnimationFrame(updatePhysics);
 
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [isHovered]);
 
   // Auto-play timer loop
   useEffect(() => {
@@ -188,16 +223,6 @@ export function Hero3DShowcase() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // 3D Scroll Tilt Physics
-  const baseScrollRotateX = 24 * (1 - scrollProgress); 
-  const baseScrollScale = 0.88 + 0.12 * scrollProgress;
-  const baseScrollOpacity = 0.5 + 0.5 * scrollProgress;
-
-  // Stable on cursor hover (box locks flat & level when mouse is inside)
-  const rotateX = isHovered ? 0 : baseScrollRotateX;
-  const rotateY = isHovered ? 0 : -2 * (1 - scrollProgress);
-  const finalScale = isHovered ? 1.0 : baseScrollScale;
-
   const glowX = (mousePos.x + 1) * 50;
   const glowY = (mousePos.y + 1) * 50;
 
@@ -209,11 +234,8 @@ export function Hero3DShowcase() {
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className="perspective-container relative group cursor-pointer"
-        style={{
-          opacity: baseScrollOpacity,
-          transition: "opacity 0.3s ease-out",
-        }}
+        className="perspective-container relative group cursor-pointer opacity-50"
+        style={{ willChange: "opacity" }}
       >
         {/* Ambient Glow */}
         <div
@@ -223,11 +245,14 @@ export function Hero3DShowcase() {
           }}
         />
 
-        {/* Outer Showcase Window (GitHub #0d1117 Dark Obsidian Shell) */}
+        {/* Outer Showcase Window (GitHub #0d1117 Dark Obsidian Shell with RAF LERP physics) */}
         <div
-          className="hero-3d-card relative rounded-2xl border border-[#30363d] bg-[#0d1117] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.85)] overflow-hidden transition-all duration-300 cubic-bezier(0.16,1,0.3,1)"
+          ref={cardRef}
+          className="hero-3d-card relative rounded-2xl border border-[#30363d] bg-[#0d1117] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.85)] overflow-hidden"
           style={{
-            transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(${finalScale}, ${finalScale}, 1)`,
+            willChange: "transform",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
           }}
         >
           {/* Metallic Top Border Highlight */}
