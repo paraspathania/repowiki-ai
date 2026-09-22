@@ -2,6 +2,8 @@
 
 import { GitBranch, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { UserNav } from "@/components/auth/UserNav";
+
 
 interface RepositoryHeaderProps {
   repoName: string;
@@ -34,7 +36,10 @@ export function RepositoryHeader({ repoName, branch, githubUrl }: RepositoryHead
           <span>Open on GitHub</span>
           <ExternalLink className="w-3.5 h-3.5" />
         </a>
+        <div className="h-4 w-px bg-white/[0.08]" />
+        <UserNav />
       </div>
+
     </header>
   );
 }

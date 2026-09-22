@@ -8,7 +8,11 @@ export interface FileNodeItem {
   path: string;
   type: "file" | "folder";
   children?: FileNodeItem[];
+  is_binary?: boolean;
+  size_bytes?: number;
+  language?: string;
 }
+
 
 interface FileTreeNodeProps {
   node: FileNodeItem;

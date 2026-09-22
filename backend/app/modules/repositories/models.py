@@ -44,3 +44,8 @@ class Repository(Base):
 
     owner_user: Mapped[Optional["User"]] = relationship("User", back_populates="repositories")
     analyses: Mapped[List["RepositoryAnalysis"]] = relationship("RepositoryAnalysis", back_populates="repository", cascade="all, delete-orphan")
+
+    @property
+    def is_private(self) -> bool:
+        return self.visibility == RepositoryVisibility.PRIVATE or str(self.visibility).lower() == "private"
+

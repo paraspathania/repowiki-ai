@@ -4,7 +4,9 @@ import { useState } from "react";
 import { RepositoryInput } from "@/components/repository/RepositoryInput";
 import { RepositoryPreviewCard } from "@/components/repository/RepositoryPreview";
 import { RepositoryPreview } from "@/types";
+import { UserNav } from "@/components/auth/UserNav";
 import { BookOpen, GitBranch, Cpu, Sparkles } from "lucide-react";
+
 
 export default function HomePage() {
   const [preview, setPreview] = useState<RepositoryPreview | null>(null);
@@ -16,10 +18,25 @@ export default function HomePage() {
       <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none z-0" />
       <div className="absolute inset-0 radial-glow pointer-events-none z-0" />
 
+      {/* Top Navigation */}
+      <header className="relative z-20 flex items-center justify-between w-full max-w-5xl mx-auto pb-2">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-extrabold text-sm shadow-md">
+            RW
+          </div>
+          <span className="font-extrabold text-white text-base tracking-tight">RepoWiki AI</span>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <UserNav />
+        </div>
+      </header>
+
       <div className="relative z-10 max-w-5xl mx-auto w-full space-y-16 flex-1 flex flex-col justify-center">
         {/* Header Hero */}
-        <div className="text-center space-y-6 pt-12 md:pt-16">
+        <div className="text-center space-y-6 pt-6 md:pt-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-950/30 border border-indigo-500/20 rounded-full text-xs font-semibold text-indigo-300 backdrop-blur-md shadow-lg shadow-indigo-950/20 mb-3 animate-fade-in">
+
             <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
             <span>RepoWiki AI v1.0</span>
           </div>

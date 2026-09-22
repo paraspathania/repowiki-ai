@@ -12,7 +12,7 @@ def redact_secrets(text: str) -> str:
         r'(AKIA[0-9A-Z]{16})',
         r'(sk-[a-zA-Z0-9]{32,})',
         r'(gh[psuo]_[a-zA-Z0-9]{36})',
-        r'-----BEGIN [A-Z ]*PRIVATE KEY-----[a-zA-Z0-9\+/\n\r=]+-----END [A-Z ]*PRIVATE KEY-----',
+        r'-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----',
         r'(eyJ[a-zA-Z0-9_-]+\.eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+)'
     ]
     for p in simple_patterns:
