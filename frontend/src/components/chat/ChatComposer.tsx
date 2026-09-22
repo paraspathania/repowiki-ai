@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Paperclip, ArrowUp, Sparkles, Code2, GitBranch, Zap } from "lucide-react";
 
 interface ChatComposerProps {
   onSend: (msg: string) => void;
@@ -16,7 +16,7 @@ export function ChatComposer({ onSend, isStreaming, suggestions = [] }: ChatComp
   const adjustHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`;
     }
   };
 
@@ -39,9 +39,10 @@ export function ChatComposer({ onSend, isStreaming, suggestions = [] }: ChatComp
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%", maxWidth: "800px", margin: "0 auto" }}>
+    <div className="flex flex-col gap-3 w-full max-w-[820px] mx-auto">
+      {/* Suggestion Chips */}
       {suggestions.length > 0 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "8px" }}>
+        <div className="flex flex-wrap gap-2">
           {suggestions.map((suggestion, idx) => (
             <button
               key={idx}
@@ -49,84 +50,59 @@ export function ChatComposer({ onSend, isStreaming, suggestions = [] }: ChatComp
                 onSend(suggestion);
                 setText("");
               }}
-              style={{
-                padding: "8px 12px",
-                borderRadius: "16px",
-                backgroundColor: "rgba(137, 180, 250, 0.1)",
-                color: "#89b4fa",
-                border: "1px solid rgba(137, 180, 250, 0.3)",
-                fontSize: "13px",
-                cursor: "pointer",
-                transition: "background-color 0.2s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(137, 180, 250, 0.2)")}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "rgba(137, 180, 250, 0.1)")}
+              className="group flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-medium bg-white/[0.03] border border-white/[0.1] text-slate-300 hover:text-white hover:bg-indigo-600/20 hover:border-indigo-500/40 transition-all duration-200 hover:shadow-md hover:shadow-indigo-500/10"
             >
-              {suggestion}
+              <Zap className="w-3 h-3 text-indigo-400 group-hover:text-indigo-300" />
+              <span>{suggestion}</span>
             </button>
           ))}
         </div>
       )}
-      
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-end",
-          gap: "12px",
-          backgroundColor: "#1e1e2e",
-          border: "1px solid #313244",
-          borderRadius: "16px",
-          padding: "12px 16px",
-          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <textarea
-          ref={textareaRef}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask a question about the repository..."
-          disabled={isStreaming}
-          style={{
-            flex: 1,
-            backgroundColor: "transparent",
-            border: "none",
-            color: "#cdd6f4",
-            fontSize: "15px",
-            resize: "none",
-            outline: "none",
-            maxHeight: "120px",
-            minHeight: "24px",
-            lineHeight: "24px",
-          }}
-          rows={1}
-        />
-        <button
-          onClick={handleSend}
-          disabled={!text.trim() || isStreaming}
-          style={{
-            padding: "8px",
-            borderRadius: "50%",
-            backgroundColor: text.trim() && !isStreaming ? "#cba6f7" : "#45475a",
-            color: text.trim() && !isStreaming ? "#11111b" : "#6c7086",
-            border: "none",
-            cursor: text.trim() && !isStreaming ? "pointer" : "not-allowed",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            transition: "background-color 0.2s",
-          }}
-        >
-          {isStreaming ? (
-            <Loader2 size={18} style={{ animation: "spin 1s linear infinite" }} />
-          ) : (
-            <Send size={18} style={{ marginLeft: "2px" }} />
-          )}
-        </button>
+
+      {/* Input Bar */}
+      <div className="relative group">
+        <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-indigo-500/20 rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 blur-sm" />
+        <div className="relative flex items-end gap-3 bg-[#0d101a] border border-white/[0.1] rounded-full px-4 py-2.5 group-focus-within:border-indigo-500/40 transition-all duration-200 shadow-xl shadow-black/20">
+          {/* Left side actions */}
+          <button className="p-2 rounded-xl text-slate-500 hover:text-slate-300 hover:bg-white/[0.06] transition flex-shrink-0 mb-0.5" title="Attach context file">
+            <Paperclip className="w-4 h-4" />
+          </button>
+
+          <textarea
+            ref={textareaRef}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask about architecture, APIs, flows, or any code question..."
+            disabled={isStreaming}
+            className="flex-1 bg-transparent text-white text-sm placeholder:text-slate-500 resize-none outline-none max-h-[150px] min-h-[24px] leading-6 py-1.5"
+            rows={1}
+          />
+
+          {/* Send Button */}
+          <button
+            onClick={handleSend}
+            disabled={!text.trim() || isStreaming}
+            className={`p-2.5 rounded-xl transition-all duration-200 flex items-center justify-center flex-shrink-0 mb-0.5 ${
+              text.trim() && !isStreaming
+                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30 hover:scale-[1.05] active:scale-[0.95]"
+                : "bg-white/[0.04] text-slate-600 cursor-not-allowed"
+            }`}
+          >
+            {isStreaming ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <ArrowUp className="w-4 h-4" />
+            )}
+          </button>
+        </div>
       </div>
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-      ` }} />
+
+      {/* Bottom footer */}
+      <div className="flex items-center justify-center gap-2 text-[10px] text-slate-600">
+        <Sparkles className="w-3 h-3 text-indigo-500/50" />
+        <span>Grounded RAG — Responses cite exact file paths & line ranges from this repository</span>
+      </div>
     </div>
   );
 }

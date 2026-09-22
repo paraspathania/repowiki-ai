@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Sparkles, User } from "lucide-react";
+import { Sparkles, User, FileCode2, ExternalLink, Copy, CheckCheck } from "lucide-react";
+import { useState } from "react";
 
 export interface Citation {
   path: string;
@@ -16,96 +17,146 @@ interface ChatMessageProps {
   };
 }
 
+function MarkdownRenderer({ content }: { content: string }) {
+  if (!content) return null;
+
+  // Split content into segments: code blocks, inline code, bold, and plain text
+  const segments: React.ReactNode[] = [];
+  let remaining = content;
+  let key = 0;
+
+  // Process code blocks first (``` ... ```)
+  const codeBlockRegex = /```(\w*)\n?([\s\S]*?)```/g;
+  let lastIdx = 0;
+  let match;
+
+  while ((match = codeBlockRegex.exec(content)) !== null) {
+    // Add text before code block
+    if (match.index > lastIdx) {
+      segments.push(
+        <span key={key++} dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(content.slice(lastIdx, match.index)) }} />
+      );
+    }
+
+    // Add code block
+    const lang = match[1] || "code";
+    const code = match[2].trim();
+    segments.push(
+      <div key={key++} className="my-3 rounded-xl overflow-hidden border border-white/[0.1]">
+        <div className="flex items-center justify-between px-4 py-2 bg-white/[0.04] border-b border-white/[0.06]">
+          <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">{lang}</span>
+          <CopyButton text={code} />
+        </div>
+        <pre className="p-4 overflow-x-auto text-xs font-mono text-emerald-300 bg-black/30 leading-relaxed">
+          <code>{code}</code>
+        </pre>
+      </div>
+    );
+
+    lastIdx = match.index + match[0].length;
+  }
+
+  // Add remaining text
+  if (lastIdx < content.length) {
+    segments.push(
+      <span key={key++} dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(content.slice(lastIdx)) }} />
+    );
+  }
+
+  if (segments.length === 0) {
+    segments.push(
+      <span key={0} dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(content) }} />
+    );
+  }
+
+  return <div className="whitespace-pre-wrap leading-relaxed">{segments}</div>;
+}
+
+function renderInlineMarkdown(text: string): string {
+  let parsed = text;
+  // Bold
+  parsed = parsed.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-white">$1</strong>');
+  // Inline code
+  parsed = parsed.replace(
+    /`([^`]+)`/g,
+    '<code class="px-1.5 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 font-mono text-[0.85em] border border-indigo-500/20">$1</code>'
+  );
+  return parsed;
+}
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }}
+      className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-semibold text-slate-400 hover:text-white hover:bg-white/[0.08] transition"
+    >
+      {copied ? <CheckCheck className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+      <span>{copied ? "Copied" : "Copy"}</span>
+    </button>
+  );
+}
+
 export function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === "user";
 
-  // Simple markdown renderer for bold, code, and citations
-  const renderContent = (content: string) => {
-    if (!content) return null;
-    
-    // This is a naive regex-based replacement. For a production app, use react-markdown.
-    let parsed = content;
-    
-    // Bold
-    parsed = parsed.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>');
-    
-    // Code
-    parsed = parsed.replace(/`(.*?)`/g, '<code style="background-color: rgba(0,0,0,0.3); padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 0.9em;">$1</code>');
-    
-    // [file:line] Citations
-    parsed = parsed.replace(/\\[(.*?):L(\\d+)\\]/g, '<span class="citation" style="background-color: rgba(137, 180, 250, 0.2); color: #89b4fa; padding: 2px 6px; border-radius: 12px; font-size: 0.8em; font-family: monospace; cursor: pointer; border: 1px solid rgba(137, 180, 250, 0.3);">[$1:$2]</span>');
-
+  if (isUser) {
     return (
-      <div 
-        style={{ whiteSpace: "pre-wrap", lineHeight: 1.6 }}
-        dangerouslySetInnerHTML={{ __html: parsed }} 
-      />
+      <div className="flex justify-end w-full">
+        <div className="max-w-[75%] flex items-start gap-3">
+          <div className="px-5 py-3.5 rounded-2xl rounded-br-md bg-gradient-to-r from-indigo-600/90 to-purple-600/80 border border-indigo-500/30 text-white text-[13px] shadow-lg shadow-indigo-600/10">
+            <MarkdownRenderer content={message.content} />
+          </div>
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center flex-shrink-0 ring-2 ring-white/10 mt-1">
+            <User className="w-3.5 h-3.5 text-slate-300" />
+          </div>
+        </div>
+      </div>
     );
-  };
+  }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: isUser ? "flex-end" : "flex-start",
-        width: "100%",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "80%",
-          padding: "16px",
-          borderRadius: "12px",
-          backgroundColor: isUser ? "#313244" : "#1e1e2e",
-          border: isUser ? "1px solid #45475a" : "1px solid #313244",
-          borderBottomRightRadius: isUser ? "4px" : "12px",
-          borderBottomLeftRadius: isUser ? "12px" : "4px",
-          color: "#cdd6f4",
-          fontSize: "15px",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-          {isUser ? (
-            <>
-              <span style={{ fontSize: "12px", color: "#a6adc8", fontWeight: "bold" }}>You</span>
-              <div style={{ background: "#45475a", padding: "4px", borderRadius: "50%" }}>
-                <User size={14} color="#cdd6f4" />
-              </div>
-            </>
-          ) : (
-            <>
-              <div style={{ background: "rgba(203, 166, 247, 0.2)", padding: "4px", borderRadius: "50%" }}>
-                <Sparkles size={14} color="#cba6f7" />
-              </div>
-              <span style={{ fontSize: "12px", color: "#cba6f7", fontWeight: "bold" }}>RepoWiki AI</span>
-            </>
+    <div className="flex justify-start w-full">
+      <div className="max-w-[85%] flex items-start gap-3">
+        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 ring-2 ring-indigo-500/30 mt-1 shadow-lg shadow-indigo-500/20">
+          <Sparkles className="w-3.5 h-3.5 text-white" />
+        </div>
+        <div className="flex flex-col gap-2 min-w-0">
+          {/* Header */}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-extrabold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              RepoWiki AI
+            </span>
+            <span className="text-[10px] text-slate-600 font-mono">•</span>
+            <span className="text-[10px] text-slate-500 font-mono">Codebase Grounded</span>
+          </div>
+
+          {/* Message Body */}
+          <div className="px-5 py-4 rounded-2xl rounded-tl-md bg-[#0d101a]/90 backdrop-blur-md border border-white/[0.08] text-slate-300 text-[13px] shadow-xl">
+            <MarkdownRenderer content={message.content} />
+          </div>
+
+          {/* Citations */}
+          {message.citations && message.citations.length > 0 && (
+            <div className="flex flex-wrap gap-2 px-1">
+              {message.citations.map((cite, idx) => (
+                <button
+                  key={idx}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-mono font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 hover:bg-indigo-500/20 hover:border-indigo-400/40 transition group"
+                >
+                  <FileCode2 className="w-3 h-3 text-indigo-400" />
+                  <span>{cite.path}{cite.line ? `:L${cite.line}` : ""}</span>
+                  <ExternalLink className="w-2.5 h-2.5 text-indigo-400/60 group-hover:text-indigo-300 ml-0.5" />
+                </button>
+              ))}
+            </div>
           )}
         </div>
-        
-        {renderContent(message.content)}
-        
-        {message.citations && message.citations.length > 0 && (
-          <div style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", flexWrap: "wrap", gap: "8px" }}>
-            {message.citations.map((cite, idx) => (
-              <span
-                key={idx}
-                style={{
-                  fontSize: "12px",
-                  padding: "4px 8px",
-                  borderRadius: "16px",
-                  backgroundColor: "rgba(137, 180, 250, 0.15)",
-                  color: "#89b4fa",
-                  fontFamily: "monospace",
-                  border: "1px solid rgba(137, 180, 250, 0.3)",
-                  cursor: "pointer",
-                }}
-              >
-                {cite.path}{cite.line ? `:L${cite.line}` : ""}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
