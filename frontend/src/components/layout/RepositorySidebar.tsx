@@ -197,7 +197,7 @@ export function RepositorySidebar({ repoId }: RepositorySidebarProps) {
     <aside
       className={`${
         isExpanded ? "w-56" : "w-[56px]"
-      } bg-[#090b11] border-r border-white/[0.08] flex flex-col items-center py-3 justify-between flex-shrink-0 z-30 transition-all duration-300 ease-in-out relative select-none`}
+      } bg-black border-r border-white/[0.08] flex flex-col items-center py-3 justify-between flex-shrink-0 z-30 transition-all duration-300 ease-in-out relative select-none`}
     >
       {/* Sidebar Expand / Collapse Toggle Header */}
       <div className="w-full px-2 pb-2 flex items-center justify-between border-b border-white/[0.06]">

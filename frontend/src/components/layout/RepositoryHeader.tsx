@@ -27,7 +27,7 @@ export function RepositoryHeader({
   const branches = ["main", "develop", "feature/rag-pipeline", "v1.0-release"];
 
   return (
-    <header className="h-14 bg-[#0d0f18]/80 backdrop-blur-md border-b border-white/[0.08] px-4 md:px-6 flex items-center justify-between text-xs sticky top-0 z-40">
+    <header className="h-14 bg-black border-b border-white/[0.08] px-4 md:px-6 flex items-center justify-between text-xs sticky top-0 z-40">
       {/* Left section */}
       <div className="flex items-center gap-3">
         <Link

@@ -66,14 +66,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const applyThemeToDOM = (themeName: WebsiteTheme) => {
     if (typeof document === "undefined") return;
     document.documentElement.setAttribute("data-theme", themeName);
-
-    if (themeName === "midnight-obsidian") {
-      document.body.style.backgroundColor = "#000000";
-    } else if (themeName === "cyberpunk-neon") {
-      document.body.style.backgroundColor = "#0d001a";
-    } else {
-      document.body.style.backgroundColor = "#030712";
-    }
+    document.body.style.backgroundColor = "#000000";
   };
 
   const updateSettings = (partial: Partial<SettingsState>) => {

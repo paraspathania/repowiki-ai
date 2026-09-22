@@ -4,12 +4,23 @@ frontend/.next/
 frontend/.env.local
 
 # Backend (Python/FastAPI)
-backend/__pycache__/
 **/__pycache__/
-backend/*.pyc
-**/*.pyc
+**/*.py[cod]
+**/*$py.class
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
 backend/venv/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
 backend/.env
+frontend/.env
+frontend/.env.local
+
 
 # General
 .DS_Store

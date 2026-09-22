@@ -145,11 +145,11 @@ export default function FileExplorerPage({ params }: { params: { repoId: string 
   };
 
   return (
-    <div className="w-full h-full flex flex-col overflow-hidden bg-[#07090e]">
+    <div className="w-full h-full flex flex-col overflow-hidden bg-black">
       {/* Main 3-Column IDE Workspace Grid */}
       <div className="flex-1 grid grid-cols-12 overflow-hidden">
         {/* Column 1: File Tree Explorer (22%) */}
-        <div className="col-span-3 h-full overflow-hidden bg-[#090c14] border-r border-white/[0.08]">
+        <div className="col-span-3 h-full overflow-hidden bg-black border-r border-white/[0.08]">
           <FileTree
             nodes={fileTree}
             selectedPath={selectedPath}
@@ -158,9 +158,9 @@ export default function FileExplorerPage({ params }: { params: { repoId: string 
         </div>
 
         {/* Column 2: Code Editor Workspace & Tabs (53%) */}
-        <div className="col-span-6 h-full flex flex-col overflow-hidden bg-[#0a0d16] border-r border-white/[0.08] relative">
+        <div className="col-span-6 h-full flex flex-col overflow-hidden bg-black border-r border-white/[0.08] relative">
           {/* Editor Tabs Bar */}
-          <div className="flex items-center bg-[#070910] border-b border-white/[0.08] overflow-x-auto no-scrollbar flex-shrink-0 select-none">
+          <div className="flex items-center bg-black border-b border-white/[0.08] overflow-x-auto no-scrollbar flex-shrink-0 select-none">
             {openTabs.map((tabPath) => {
               const fileName = tabPath.split("/").pop() || tabPath;
               const isActive = selectedPath === tabPath;
@@ -215,14 +215,14 @@ export default function FileExplorerPage({ params }: { params: { repoId: string 
 
           {/* Collapsible IDE Compiler Terminal Drawer */}
           <div
-            className={`border-t border-white/[0.08] bg-[#070910] flex flex-col transition-all duration-300 flex-shrink-0 ${
+            className={`border-t border-white/[0.08] bg-black flex flex-col transition-all duration-300 flex-shrink-0 ${
               isConsoleOpen ? "h-48" : "h-8"
             }`}
           >
             {/* Drawer Header Bar */}
             <div
               onClick={() => setIsConsoleOpen(!isConsoleOpen)}
-              className="flex items-center justify-between px-4 py-1.5 bg-[#090c15] cursor-pointer hover:bg-white/[0.02] border-b border-white/[0.06] select-none"
+              className="flex items-center justify-between px-4 py-1.5 bg-black cursor-pointer hover:bg-white/[0.04] border-b border-white/[0.06] select-none"
             >
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-white">

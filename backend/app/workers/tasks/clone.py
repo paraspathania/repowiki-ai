@@ -71,9 +71,17 @@ def clone_repository(self, analysis_id: str, repo_url: str, branch: str = "main"
         shutil.rmtree(target_dir, ignore_errors=True)
         raise ValueError(f"Cloned repository size ({size_mb:.1f} MB) exceeds maximum limit ({settings.MAX_CLONE_SIZE_MB} MB).")
 
+    # 5. Chain directly to analysis worker task
+    try:
+        from app.workers.tasks.analyze import analyze_repository_task
+        analyze_repository_task.delay(analysis_id=analysis_id, workspace_path=str(target_dir))
+    except Exception as e:
+        logger.warning("failed_to_dispatch_analyze_task", analysis_id=analysis_id, error=str(e))
+
     return {
         "analysis_id": analysis_id,
         "status": "cloned",
         "workspace_path": str(target_dir),
         "size_mb": size_mb,
     }
+
