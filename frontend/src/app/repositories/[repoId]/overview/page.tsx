@@ -55,10 +55,13 @@ function StatCard({
 export default function RepositoryOverviewPage({ params }: { params: { repoId: string } }) {
   const [repo, setRepo] = useState<Repository | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
+    setError(false);
     // Load cached data instantly, then refresh stats from GitHub
     repoService.getRepository(params.repoId).then((data) => {
+      if (!data) { setError(true); return; }
       setRepo(data);
       // Silently refresh live stats in the background
       repoService.refreshRepositoryStats(params.repoId).then((fresh) => {
@@ -72,6 +75,20 @@ export default function RepositoryOverviewPage({ params }: { params: { repoId: s
     const fresh = await repoService.refreshRepositoryStats(params.repoId);
     if (fresh) setRepo(fresh);
     setRefreshing(false);
+  }
+
+  if (error) {
+    return (
+      <div className="p-8 flex flex-col items-center justify-center gap-4 text-center h-full">
+        <p className="text-slate-400 text-sm">Failed to load repository data.</p>
+        <button
+          onClick={() => { setError(false); repoService.getRepository(params.repoId).then((d) => d && setRepo(d)); }}
+          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition"
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
   if (!repo) {

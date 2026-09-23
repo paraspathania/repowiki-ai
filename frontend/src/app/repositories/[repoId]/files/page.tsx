@@ -81,15 +81,17 @@ export default function FileExplorerPage({ params }: { params: { repoId: string 
   ]);
 
   useEffect(() => {
-    repoService.getFileTree(params.repoId).then((nodes: any[]) => {
+    repoService.getFileTree(params.repoId).then((response: any) => {
+      // API returns { tree: [...], total_files: N, analysis_id: "..." }
+      const nodes = Array.isArray(response) ? response : (response?.tree ?? response?.files ?? []);
       const mapped: FileNodeItem[] = nodes.map((n: any) => ({
         name: n.name,
         path: n.path,
-        type: (n.type === "directory" ? "folder" : "file") as "folder" | "file",
+        type: (n.type === "directory" || n.type === "folder" ? "folder" : "file") as "folder" | "file",
         children: n.children?.map((c: any) => ({
           name: c.name,
           path: c.path,
-          type: (c.type === "directory" ? "folder" : "file") as "folder" | "file",
+          type: (c.type === "directory" || c.type === "folder" ? "folder" : "file") as "folder" | "file",
         })),
       }));
       setFileTree(mapped);

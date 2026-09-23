@@ -23,7 +23,7 @@ export const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 5000,
+  timeout: 30000,
 });
 
 apiClient.interceptors.request.use((config) => {
@@ -52,8 +52,9 @@ export const repoService = {
     try {
       const res = await apiClient.get(`/repositories/${repoId}`);
       return res.data;
-    } catch {
-      return { ...MOCK_REPOSITORY, id: repoId };
+    } catch (err) {
+      console.error("[repoService] getRepository failed:", err);
+      return null;
     }
   },
 
