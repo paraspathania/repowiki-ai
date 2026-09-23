@@ -1,3 +1,4 @@
+import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import SecretStr
 from typing import Optional
@@ -51,7 +52,7 @@ class Settings(BaseSettings):
     MAX_CLONE_SIZE_MB: int = 250
     MAX_RELEVANT_FILES: int = 5000
     MAX_FILE_SIZE_MB: int = 1
-    WORKSPACE_DIR: str = "/tmp/repowiki_workspaces"
+    WORKSPACE_DIR: str = "/workspaces" if os.path.exists("/workspaces") else "/tmp/repowiki_workspaces"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

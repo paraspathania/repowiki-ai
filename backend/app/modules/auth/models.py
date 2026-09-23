@@ -40,7 +40,7 @@ class OAuthAccount(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
-    provider: Mapped[OAuthProvider] = mapped_column(SQLEnum(OAuthProvider), nullable=False)
+    provider: Mapped[OAuthProvider] = mapped_column(SQLEnum(OAuthProvider, native_enum=False), nullable=False)
     provider_user_id: Mapped[str] = mapped_column(String(255), nullable=False)
     
     access_token_encrypted: Mapped[str] = mapped_column(String(1024), nullable=False)

@@ -26,9 +26,9 @@ class EndpointOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-@router.get("/{repository_id}/apis")
+@router.get("/{repo_id}/apis")
 async def list_apis(
-    repository_id: uuid.UUID,
+    repo_id: uuid.UUID,
     method: Optional[str] = None,
     path_prefix: Optional[str] = None,
     repo: Repository = Depends(get_accessible_repository),

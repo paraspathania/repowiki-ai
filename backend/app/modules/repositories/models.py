@@ -24,7 +24,7 @@ class Repository(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str] = mapped_column(String(512), nullable=False, index=True)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    visibility: Mapped[RepositoryVisibility] = mapped_column(SQLEnum(RepositoryVisibility), default=RepositoryVisibility.PUBLIC)
+    visibility: Mapped[RepositoryVisibility] = mapped_column(SQLEnum(RepositoryVisibility, native_enum=False), default=RepositoryVisibility.PUBLIC)
     default_branch: Mapped[str] = mapped_column(String(255), default="main")
     github_url: Mapped[str] = mapped_column(String(1024), nullable=False)
     

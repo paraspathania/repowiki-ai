@@ -32,7 +32,7 @@ class RepositoryAnalysis(Base):
     commit_sha: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     selected_path: Mapped[str] = mapped_column(Text, default="/")
     
-    status: Mapped[AnalysisStatus] = mapped_column(SQLEnum(AnalysisStatus), default=AnalysisStatus.QUEUED, index=True)
+    status: Mapped[AnalysisStatus] = mapped_column(SQLEnum(AnalysisStatus, native_enum=False), default=AnalysisStatus.QUEUED, index=True)
     progress: Mapped[int] = mapped_column(SmallInteger, default=0)
     
     started_at: Mapped[datetime] = mapped_column(
@@ -57,7 +57,7 @@ class AnalysisJob(Base):
     
     stage: Mapped[str] = mapped_column(String(64), nullable=False)
     celery_task_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    status: Mapped[AnalysisStatus] = mapped_column(SQLEnum(AnalysisStatus), default=AnalysisStatus.QUEUED)
+    status: Mapped[AnalysisStatus] = mapped_column(SQLEnum(AnalysisStatus, native_enum=False), default=AnalysisStatus.QUEUED)
     attempt: Mapped[int] = mapped_column(Integer, default=1)
     progress: Mapped[int] = mapped_column(SmallInteger, default=0)
     

@@ -11,6 +11,17 @@ from app.core.logging import setup_logging, logger
 from app.core.exceptions import RepoWikiException
 from app.core.rate_limit import limiter
 
+# Ensure all SQLAlchemy models are registered
+import app.modules.auth.models  # noqa: F401
+import app.modules.repositories.models  # noqa: F401
+import app.modules.analysis.models  # noqa: F401
+import app.modules.files.models  # noqa: F401
+import app.modules.symbols.models  # noqa: F401
+import app.modules.api_detection.models  # noqa: F401
+import app.modules.chat.models  # noqa: F401
+import app.modules.wiki.models  # noqa: F401
+import app.modules.exports.models  # noqa: F401
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

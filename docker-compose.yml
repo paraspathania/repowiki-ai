@@ -54,6 +54,7 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - WORKSPACE_DIR=/workspaces
     volumes:
       - ./backend:/app
       - workspace_data:/workspaces
@@ -82,6 +83,7 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - WORKSPACE_DIR=/workspaces
     volumes:
       - ./backend:/app
       - workspace_data:/workspaces
@@ -104,7 +106,6 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-      - /app/.next
     depends_on:
       - api
 

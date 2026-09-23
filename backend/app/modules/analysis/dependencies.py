@@ -13,11 +13,18 @@ from app.modules.analysis.models import RepositoryAnalysis, AnalysisStatus
 
 
 async def get_accessible_repository(
-    repo_id: uuid.UUID,
+    repo_id: Optional[uuid.UUID] = None,
+    repository_id: Optional[uuid.UUID] = None,
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db),
 ) -> Repository:
-    repo = await db.get(Repository, repo_id)
+    target_id = repo_id or repository_id
+    if not target_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Repository ID required"
+        )
+    repo = await db.get(Repository, target_id)
     if not repo or repo.deleted_at:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

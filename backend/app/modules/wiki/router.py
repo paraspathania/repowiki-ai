@@ -18,9 +18,9 @@ from app.api.dependencies import get_current_user_optional
 router = APIRouter(prefix="/repositories", tags=["wiki"])
 
 
-@router.get("/{repository_id}/wiki")
+@router.get("/{repo_id}/wiki")
 async def get_wiki(
-    repository_id: uuid.UUID,
+    repo_id: uuid.UUID,
     repo: Repository = Depends(get_accessible_repository),
     db: AsyncSession = Depends(get_db),
 ):

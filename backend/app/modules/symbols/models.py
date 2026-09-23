@@ -25,7 +25,7 @@ class RepositorySymbol(Base):
     
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     qualified_name: Mapped[str] = mapped_column(Text, nullable=False, index=True)
-    symbol_type: Mapped[SymbolType] = mapped_column(SQLEnum(SymbolType), nullable=False, index=True)
+    symbol_type: Mapped[SymbolType] = mapped_column(SQLEnum(SymbolType, native_enum=False), nullable=False, index=True)
     
     start_line: Mapped[int] = mapped_column(Integer, nullable=False)
     end_line: Mapped[int] = mapped_column(Integer, nullable=False)

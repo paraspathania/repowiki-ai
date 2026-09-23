@@ -2,6 +2,8 @@ from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 
+from sqlalchemy.pool import NullPool
+
 from app.core.config import settings
 
 engine = create_async_engine(
@@ -9,8 +11,7 @@ engine = create_async_engine(
     echo=False,
     future=True,
     pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
+    poolclass=NullPool,
 )
 
 AsyncSessionLocal = async_sessionmaker(
@@ -30,3 +31,19 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             yield session
         finally:
             await session.close()
+
+
+def load_all_models():
+    import app.modules.auth.models  # noqa: F401
+    import app.modules.repositories.models  # noqa: F401
+    import app.modules.analysis.models  # noqa: F401
+    import app.modules.files.models  # noqa: F401
+    import app.modules.symbols.models  # noqa: F401
+    import app.modules.api_detection.models  # noqa: F401
+    import app.modules.chat.models  # noqa: F401
+    import app.modules.wiki.models  # noqa: F401
+    import app.modules.exports.models  # noqa: F401
+
+
+# Automatically ensure all models are registered in mapper registry
+load_all_models()

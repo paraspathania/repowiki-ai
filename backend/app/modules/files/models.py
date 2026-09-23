@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Optional, List
 
 from app.core.database import Base
+from app.modules.symbols.models import RepositorySymbol
 
 
 class RepositoryFile(Base):
