@@ -42,6 +42,7 @@ class RepositoryOut(BaseModel):
     github_url: str
     stars: int
     forks: int
+    contributors_count: int = 0
     size_bytes: int
     created_at: datetime
 

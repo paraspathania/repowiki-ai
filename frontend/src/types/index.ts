@@ -42,6 +42,8 @@ export interface Repository {
   created_at: string;
   lines_of_code?: number;
   total_files?: number;
+  loc_count?: number;      // returned by /summary
+  file_count?: number;     // returned by /summary
   contributors_count?: number;
   last_updated?: string;
   languages?: Record<string, number>;

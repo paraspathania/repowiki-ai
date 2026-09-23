@@ -3,40 +3,117 @@
 import { useEffect, useState } from "react";
 import { repoService } from "@/lib/api/client";
 import { Repository } from "@/types";
-import { BookOpen, FolderTree, Network, GitCommit, Server, ShieldAlert, GraduationCap, Star, GitFork, Code2, Users, HardDrive } from "lucide-react";
+import {
+  BookOpen,
+  FolderTree,
+  Network,
+  GitCommit,
+  Server,
+  ShieldAlert,
+  GraduationCap,
+  Star,
+  GitFork,
+  Code2,
+  Users,
+  HardDrive,
+  RefreshCw,
+} from "lucide-react";
 import Link from "next/link";
+
+function formatBytes(bytes: number): string {
+  if (!bytes || bytes === 0) return "—";
+  const mb = bytes / 1_000_000;
+  if (mb >= 1) return `${mb.toFixed(1)} MB`;
+  const kb = bytes / 1_000;
+  return `${kb.toFixed(0)} KB`;
+}
+
+function StatCard({
+  icon: Icon,
+  iconColor,
+  label,
+  value,
+}: {
+  icon: React.ElementType;
+  iconColor: string;
+  label: string;
+  value: string | number;
+}) {
+  return (
+    <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-1">
+      <div className="flex items-center gap-1 text-slate-400 text-[10px]">
+        <Icon className={`w-3 h-3 ${iconColor}`} />
+        <span>{label}</span>
+      </div>
+      <p className="text-sm font-bold text-white font-mono">
+        {value ?? "—"}
+      </p>
+    </div>
+  );
+}
 
 export default function RepositoryOverviewPage({ params }: { params: { repoId: string } }) {
   const [repo, setRepo] = useState<Repository | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    repoService.getRepository(params.repoId).then(setRepo);
+    // Load cached data instantly, then refresh stats from GitHub
+    repoService.getRepository(params.repoId).then((data) => {
+      setRepo(data);
+      // Silently refresh live stats in the background
+      repoService.refreshRepositoryStats(params.repoId).then((fresh) => {
+        if (fresh) setRepo(fresh);
+      });
+    });
   }, [params.repoId]);
 
-  if (!repo) {
-    return <div className="p-8 text-slate-400 text-xs font-mono">Loading repository overview...</div>;
+  async function handleManualRefresh() {
+    setRefreshing(true);
+    const fresh = await repoService.refreshRepositoryStats(params.repoId);
+    if (fresh) setRepo(fresh);
+    setRefreshing(false);
   }
+
+  if (!repo) {
+    return (
+      <div className="p-8 text-slate-400 text-xs font-mono animate-pulse">
+        Loading repository overview...
+      </div>
+    );
+  }
+
+  const locCount = repo.lines_of_code ?? repo.loc_count ?? 0;
+  const fileCount = repo.total_files ?? repo.file_count ?? 0;
+  const sizeBytes = repo.size_bytes ?? 0;
 
   return (
     <div className="h-full overflow-y-auto p-6 md:p-8 space-y-8 bg-[#07090e]">
       {/* Top Banner */}
       <div className="glass-panel p-6 rounded-3xl space-y-4 relative overflow-hidden">
         <div className="absolute right-0 top-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        
+
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-extrabold text-white tracking-tight">{repo.full_name}</h1>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                Analyzed & Grounded
+                Analyzed &amp; Grounded
               </span>
             </div>
             <p className="text-slate-400 text-xs max-w-2xl leading-relaxed">
-              {repo.description}
+              {repo.description || "No description provided."}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={handleManualRefresh}
+              disabled={refreshing}
+              title="Refresh stats from GitHub"
+              className="p-2 rounded-xl border border-white/[0.08] hover:border-white/[0.16] text-slate-400 hover:text-white transition-all duration-200 disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
+            </button>
             <Link
               href={`/repositories/${params.repoId}/wiki`}
               className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 transition flex items-center gap-1.5"
@@ -49,53 +126,42 @@ export default function RepositoryOverviewPage({ params }: { params: { repoId: s
 
         {/* Quick Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 pt-4 border-t border-white/[0.06]">
-          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-1">
-            <div className="flex items-center gap-1 text-slate-400 text-[10px]">
-              <Code2 className="w-3 h-3 text-indigo-400" />
-              <span>Lines of Code</span>
-            </div>
-            <p className="text-sm font-bold text-white font-mono">{(repo.lines_of_code || 48920).toLocaleString()}</p>
-          </div>
-
-          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-1">
-            <div className="flex items-center gap-1 text-slate-400 text-[10px]">
-              <FolderTree className="w-3 h-3 text-cyan-400" />
-              <span>Total Files</span>
-            </div>
-            <p className="text-sm font-bold text-white font-mono">{repo.total_files || 342}</p>
-          </div>
-
-          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-1">
-            <div className="flex items-center gap-1 text-slate-400 text-[10px]">
-              <Star className="w-3 h-3 text-amber-400" />
-              <span>Stars</span>
-            </div>
-            <p className="text-sm font-bold text-white font-mono">{(repo.stars || 1240).toLocaleString()}</p>
-          </div>
-
-          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-1">
-            <div className="flex items-center gap-1 text-slate-400 text-[10px]">
-              <GitFork className="w-3 h-3 text-purple-400" />
-              <span>Forks</span>
-            </div>
-            <p className="text-sm font-bold text-white font-mono">{repo.forks || 182}</p>
-          </div>
-
-          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-1">
-            <div className="flex items-center gap-1 text-slate-400 text-[10px]">
-              <Users className="w-3 h-3 text-emerald-400" />
-              <span>Contributors</span>
-            </div>
-            <p className="text-sm font-bold text-white font-mono">{repo.contributors_count || 14}</p>
-          </div>
-
-          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-1">
-            <div className="flex items-center gap-1 text-slate-400 text-[10px]">
-              <HardDrive className="w-3 h-3 text-rose-400" />
-              <span>Repo Size</span>
-            </div>
-            <p className="text-sm font-bold text-white font-mono">{(repo.size_bytes / 1000000).toFixed(1)} MB</p>
-          </div>
+          <StatCard
+            icon={Code2}
+            iconColor="text-indigo-400"
+            label="Lines of Code"
+            value={locCount > 0 ? locCount.toLocaleString() : "—"}
+          />
+          <StatCard
+            icon={FolderTree}
+            iconColor="text-cyan-400"
+            label="Total Files"
+            value={fileCount > 0 ? fileCount.toLocaleString() : "—"}
+          />
+          <StatCard
+            icon={Star}
+            iconColor="text-amber-400"
+            label="Stars"
+            value={repo.stars != null ? repo.stars.toLocaleString() : "—"}
+          />
+          <StatCard
+            icon={GitFork}
+            iconColor="text-purple-400"
+            label="Forks"
+            value={repo.forks != null ? repo.forks.toLocaleString() : "—"}
+          />
+          <StatCard
+            icon={Users}
+            iconColor="text-emerald-400"
+            label="Contributors"
+            value={repo.contributors_count > 0 ? repo.contributors_count.toLocaleString() : "—"}
+          />
+          <StatCard
+            icon={HardDrive}
+            iconColor="text-rose-400"
+            label="Repo Size"
+            value={formatBytes(sizeBytes)}
+          />
         </div>
       </div>
 
@@ -106,7 +172,7 @@ export default function RepositoryOverviewPage({ params }: { params: { repoId: s
             <BookOpen className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-white">14-Section Technical Wiki</h3>
+            <h3 className="text-sm font-bold text-white">Technical Wiki</h3>
             <p className="text-xs text-slate-400 mt-1 leading-relaxed">
               Auto-generated documentation detailing architecture, folder structure, deployment, and security.
             </p>
@@ -118,7 +184,7 @@ export default function RepositoryOverviewPage({ params }: { params: { repoId: s
             <Network className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-white">Architecture & Component Visualizer</h3>
+            <h3 className="text-sm font-bold text-white">Architecture &amp; Component Visualizer</h3>
             <p className="text-xs text-slate-400 mt-1 leading-relaxed">
               Interactive Mermaid diagrams visualizing system layers, folder imports, and microservice topologies.
             </p>
@@ -142,7 +208,7 @@ export default function RepositoryOverviewPage({ params }: { params: { repoId: s
             <ShieldAlert className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-white">Security & Secret Audit</h3>
+            <h3 className="text-sm font-bold text-white">Security &amp; Secret Audit</h3>
             <p className="text-xs text-slate-400 mt-1 leading-relaxed">
               Detects hardcoded secrets, SQL injection risks, and SAIF data masking compliance.
             </p>
@@ -166,7 +232,7 @@ export default function RepositoryOverviewPage({ params }: { params: { repoId: s
             <GitCommit className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-white">Animated Code & Flow Trace</h3>
+            <h3 className="text-sm font-bold text-white">Animated Code &amp; Flow Trace</h3>
             <p className="text-xs text-slate-400 mt-1 leading-relaxed">
               Step-by-step animation of API request lifecycles, AST extraction, and database persistence.
             </p>

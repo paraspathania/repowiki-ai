@@ -57,6 +57,15 @@ export const repoService = {
     }
   },
 
+  async refreshRepositoryStats(repoId: string) {
+    try {
+      const res = await apiClient.get(`/repositories/${repoId}/refresh-stats`);
+      return res.data;
+    } catch {
+      return null;
+    }
+  },
+
   async getWikiSections(repoId: string) {
     try {
       const res = await apiClient.get(`/repositories/${repoId}/wiki`);

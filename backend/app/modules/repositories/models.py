@@ -30,6 +30,7 @@ class Repository(Base):
     
     stars: Mapped[int] = mapped_column(Integer, default=0)
     forks: Mapped[int] = mapped_column(Integer, default=0)
+    contributors_count: Mapped[int] = mapped_column(Integer, default=0)
     size_bytes: Mapped[int] = mapped_column(BigInteger, default=0)
 
     created_at: Mapped[datetime] = mapped_column(
