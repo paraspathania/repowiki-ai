@@ -18,6 +18,14 @@ from app.modules.repositories.models import Repository
 from app.modules.files.models import RepositoryFile
 from app.modules.symbols.models import RepositorySymbol, SymbolType
 from app.modules.api_detection.models import RepositoryAPI
+from app.modules.dependencies.models import RepositoryDependency
+from app.modules.dependencies.parser import parse_dependency_file
+from app.modules.database_detection.models import (
+    RepositoryDatabaseTable,
+    RepositoryDatabaseColumn,
+    RepositoryDatabaseRelationship,
+)
+from app.modules.database_detection.extractor import extract_database_schema
 from app.modules.parser.registry import get_parser_for_extension
 from app.modules.parser.chunker import CodeChunker
 from app.workers.tasks.embeddings import embed_repository_chunks
@@ -184,6 +192,7 @@ async def _run_analysis_pipeline(analysis_id_str: str, workspace_path_str: str):
         parse_warnings = 0
         chunker = CodeChunker()
         chunks_to_insert = []
+        db_candidates: List[Tuple[str, str]] = []
 
         for repo_file, full_path in created_files:
             if repo_file.is_binary:
@@ -235,6 +244,32 @@ async def _run_analysis_pipeline(analysis_id_str: str, workspace_path_str: str):
                     logger.warning("file_parse_error", file=repo_file.path, error=str(e))
                     parse_warnings += 1
 
+            # Dependency manifest extraction
+            file_name_lower = repo_file.name.lower()
+            if file_name_lower in (
+                "requirements.txt", "package.json", "pyproject.toml",
+                "pipfile", "go.mod"
+            ) or ("requirements" in file_name_lower and file_name_lower.endswith(".txt")):
+                try:
+                    parsed_deps = parse_dependency_file(repo_file.path, content)
+                    for d in parsed_deps:
+                        db_dep = RepositoryDependency(
+                            id=uuid.uuid4(),
+                            analysis_id=analysis.id,
+                            name=d.name,
+                            version=d.version,
+                            type=d.type,
+                            language=d.language,
+                            file_path=d.file_path,
+                        )
+                        db.add(db_dep)
+                except Exception as e:
+                    logger.warning("dependency_parse_error", file=repo_file.path, error=str(e))
+
+            # Database model candidate files
+            if ext in (".py", ".sql", ".prisma"):
+                db_candidates.append((repo_file.path, content))
+
             # Chunk code for vector embeddings
             if repo_file.language in ("Python", "TypeScript", "JavaScript", "HTML", "CSS", "SQL", "Go", "Rust"):
                 try:
@@ -265,6 +300,45 @@ async def _run_analysis_pipeline(analysis_id_str: str, workspace_path_str: str):
                         })
                 except Exception as e:
                     logger.warning("chunk_error", file=repo_file.path, error=str(e))
+
+        # Database schema / ERD model extraction
+        if db_candidates:
+            try:
+                extracted_tables = extract_database_schema(db_candidates)
+                for tbl in extracted_tables:
+                    db_table = RepositoryDatabaseTable(
+                        id=uuid.uuid4(),
+                        analysis_id=analysis.id,
+                        name=tbl.name,
+                        source_file=tbl.source_file,
+                    )
+                    db.add(db_table)
+                    for col in tbl.columns:
+                        db_col = RepositoryDatabaseColumn(
+                            id=uuid.uuid4(),
+                            table_id=db_table.id,
+                            name=col.name,
+                            data_type=col.data_type,
+                            is_primary_key=col.is_primary_key,
+                            is_nullable=col.is_nullable,
+                            is_foreign_key=col.is_foreign_key,
+                            references_table=col.references_table,
+                            references_column=col.references_column,
+                        )
+                        db.add(db_col)
+                    for rel in tbl.relationships:
+                        db_rel = RepositoryDatabaseRelationship(
+                            id=uuid.uuid4(),
+                            table_id=db_table.id,
+                            from_column=rel.from_column,
+                            to_table=rel.to_table,
+                            to_column=rel.to_column,
+                            type=rel.type,
+                            is_ambiguous=rel.is_ambiguous,
+                        )
+                        db.add(db_rel)
+            except Exception as e:
+                logger.warning("database_schema_extraction_error", error=str(e))
 
         await db.commit()
 

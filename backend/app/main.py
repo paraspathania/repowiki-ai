@@ -21,6 +21,8 @@ import app.modules.api_detection.models  # noqa: F401
 import app.modules.chat.models  # noqa: F401
 import app.modules.wiki.models  # noqa: F401
 import app.modules.exports.models  # noqa: F401
+import app.modules.dependencies.models  # noqa: F401
+import app.modules.database_detection.models  # noqa: F401
 
 
 @asynccontextmanager

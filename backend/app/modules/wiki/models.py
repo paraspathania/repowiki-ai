@@ -14,6 +14,8 @@ class Wiki(Base):
     repository_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("repositories.id", ondelete="CASCADE"), unique=True, nullable=False)
     analysis_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("repository_analyses.id", ondelete="CASCADE"), nullable=False)
     status: Mapped[str] = mapped_column(String(32), default="generating", nullable=False)
+    generation_mode: Mapped[Optional[str]] = mapped_column(String(32), default="llm", nullable=True)
+    error_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)

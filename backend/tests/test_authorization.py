@@ -111,3 +111,42 @@ async def test_get_accessible_repository_private_owner():
     # Authenticated owner is allowed access
     result = await get_accessible_repository(repo_id=repo_id, current_user=owner_user, db=mock_db)
     assert result.id == repo_id
+
+
+def test_new_endpoints_enforce_get_accessible_repository():
+    from app.main import app
+    from app.modules.analysis.dependencies import get_accessible_repository
+
+    def get_all_routes(router):
+        routes = []
+        for r in getattr(router, "routes", []):
+            if hasattr(r, "original_router"):
+                routes.extend(get_all_routes(r.original_router))
+            elif hasattr(r, "routes"):
+                routes.extend(get_all_routes(r))
+            else:
+                routes.append(r)
+        return routes
+
+    all_routes = get_all_routes(app)
+
+    checked_routes = [
+        "/repositories/{repo_id}/dependencies",
+        "/repositories/{repo_id}/database",
+        "/repositories/{repo_id}/wiki/generate",
+        "/repositories/{repo_id}/architecture",
+        "/repositories/{repo_id}/wiki",
+    ]
+
+    found = 0
+    for route in all_routes:
+        path = getattr(route, "path", "")
+        if path in checked_routes:
+            dependant = getattr(route, "dependant", None)
+            if dependant:
+                dep_callables = [d.call for d in dependant.dependencies if hasattr(d, "call")]
+                assert get_accessible_repository in dep_callables, f"{path} does not depend on get_accessible_repository"
+                found += 1
+
+    assert found >= len(checked_routes), f"Expected at least {len(checked_routes)} protected routes, found {found}"
+

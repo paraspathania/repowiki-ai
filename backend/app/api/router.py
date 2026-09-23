@@ -8,6 +8,8 @@ from app.modules.search.router import router as search_router
 from app.modules.chat.router import router as chat_router
 from app.modules.wiki.router import router as wiki_router
 from app.modules.api_detection.router import router as api_detection_router
+from app.modules.dependencies.router import router as dependencies_router
+from app.modules.database_detection.router import router as database_detection_router
 from app.modules.exports.router import router as exports_router
 
 api_router = APIRouter(prefix="/v1")
@@ -20,5 +22,7 @@ api_router.include_router(search_router)
 api_router.include_router(chat_router)
 api_router.include_router(wiki_router)
 api_router.include_router(api_detection_router)
+api_router.include_router(dependencies_router)
+api_router.include_router(database_detection_router)
 api_router.include_router(exports_router)
 

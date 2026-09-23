@@ -43,6 +43,8 @@ def load_all_models():
     import app.modules.chat.models  # noqa: F401
     import app.modules.wiki.models  # noqa: F401
     import app.modules.exports.models  # noqa: F401
+    import app.modules.dependencies.models  # noqa: F401
+    import app.modules.database_detection.models  # noqa: F401
 
 
 # Automatically ensure all models are registered in mapper registry

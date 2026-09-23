@@ -234,6 +234,7 @@ async def get_analysis_summary(
     return _compute_summary(repo, analysis, files, endpoints_count)
 
 
+@router.get("/repositories/{repo_id}/architecture")
 @router.get("/repositories/{repo_id}/diagrams")
 async def get_repository_diagrams(
     repo_id: uuid.UUID,
