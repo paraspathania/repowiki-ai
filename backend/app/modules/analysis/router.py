@@ -316,14 +316,16 @@ async def stream_analysis_events(
     db: AsyncSession = Depends(get_db),
 ):
     async def event_generator():
-        # Live polling loop with fallback
-        for _ in range(30):
+        # Live polling loop with fallback (up to 10 minutes)
+        for _ in range(300):
             await db.refresh(analysis)
             data = {
                 "stage": analysis.status.value,
                 "progress": analysis.progress,
                 "status": "completed" if analysis.status == AnalysisStatus.COMPLETED else ("failed" if analysis.status == AnalysisStatus.FAILED else "running"),
-                "message": f"Pipeline stage: {analysis.status.value}"
+                "message": f"Pipeline stage: {analysis.status.value}",
+                "repository_id": str(analysis.repository_id),
+                "failure_reason": analysis.failure_reason,
             }
             yield f"data: {json.dumps(data)}\n\n"
             if analysis.status in (AnalysisStatus.COMPLETED, AnalysisStatus.FAILED, AnalysisStatus.CANCELLED):

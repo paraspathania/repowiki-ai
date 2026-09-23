@@ -35,6 +35,8 @@ export function AnalysisProgressCard({ event, analysisId, repoId }: AnalysisProg
   const isCompleted = currentProgress >= 100 || event.status === "completed";
   const isFailed = event.status === "failed";
 
+  const targetRepoId = event.repository_id || repoId;
+
   return (
     <div className="w-full max-w-2xl mx-auto glass-panel rounded-2xl p-8 space-y-8 shadow-2xl relative overflow-hidden animate-fade-in">
       <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 animate-pulse" />
@@ -93,7 +95,7 @@ export function AnalysisProgressCard({ event, analysisId, repoId }: AnalysisProg
       {isCompleted && (
         <div className="pt-4 border-t border-white/[0.06]">
           <Link
-            href={repoId ? `/repositories/${repoId}` : `/repositories/overview`}
+            href={targetRepoId ? `/repositories/${targetRepoId}/overview` : `/dashboard`}
             className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold rounded-xl flex items-center justify-center gap-2.5 transition duration-300 shadow-xl shadow-indigo-500/15 active:scale-[0.99] shimmer-btn"
           >
             <span>Open Repository Workspace</span>
@@ -106,7 +108,7 @@ export function AnalysisProgressCard({ event, analysisId, repoId }: AnalysisProg
         <div className="pt-6 border-t border-white/[0.06] flex flex-col md:flex-row md:items-center justify-between gap-4 text-rose-300 text-sm">
           <div className="flex items-center gap-2.5">
             <AlertTriangle className="w-5 h-5 text-rose-400 flex-shrink-0" />
-            <span>Analysis process encountered an error.</span>
+            <span>{event.failure_reason ? `Analysis failed: ${event.failure_reason}` : "Analysis process encountered an error."}</span>
           </div>
           <button
             onClick={() => window.location.reload()}

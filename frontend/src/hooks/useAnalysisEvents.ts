@@ -7,6 +7,8 @@ export interface ProgressEvent {
   progress: number;
   message: string;
   status: "queued" | "running" | "completed" | "failed";
+  repository_id?: string;
+  failure_reason?: string;
 }
 
 export function useAnalysisEvents(analysisId: string) {
