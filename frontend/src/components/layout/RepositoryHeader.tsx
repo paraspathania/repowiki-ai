@@ -3,7 +3,7 @@
 import { GitBranch, ExternalLink, Search, Star, GitFork, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { UserMenu } from "@/components/auth/UserMenu";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface RepositoryHeaderProps {
   repoName: string;
