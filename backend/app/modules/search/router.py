@@ -4,11 +4,8 @@ from app.modules.search.service import HybridSearchService
 from app.core.database import get_db
 import uuid
 
-try:
-    from app.api.dependencies import get_current_user
-except ImportError:
-    def get_current_user():
-        return None
+from app.modules.analysis.dependencies import get_accessible_repository
+from app.modules.repositories.models import Repository
 
 router = APIRouter(prefix="/repositories", tags=["search"])
 
@@ -17,7 +14,7 @@ async def semantic_search(
     repository_id: uuid.UUID,
     request: SemanticSearchRequest,
     db=Depends(get_db),
-    current_user=Depends(get_current_user)
+    repo: Repository = Depends(get_accessible_repository),
 ):
     service = HybridSearchService(db)
     filters = {
@@ -34,7 +31,7 @@ async def keyword_search(
     q: str = Query(..., min_length=1),
     limit: int = Query(10, ge=1, le=100),
     db=Depends(get_db),
-    current_user=Depends(get_current_user)
+    repo: Repository = Depends(get_accessible_repository),
 ):
     service = HybridSearchService(db)
     results = await service.keyword_search(q, repository_id, limit)

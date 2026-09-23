@@ -12,7 +12,7 @@ class HybridSearchService:
 
     async def _get_latest_analysis_id(self, repository_id: uuid.UUID) -> Optional[uuid.UUID]:
         res = await self.db.execute(
-            text("SELECT id FROM repository_analyses WHERE repository_id = :repo_id ORDER BY created_at DESC LIMIT 1"),
+            text("SELECT id FROM repository_analyses WHERE repository_id = :repo_id ORDER BY started_at DESC LIMIT 1"),
             {"repo_id": str(repository_id)}
         )
         row = res.fetchone()

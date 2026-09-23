@@ -67,6 +67,16 @@ export const repoService = {
     }
   },
 
+  async getBranches(repoId: string) {
+    try {
+      const res = await apiClient.get(`/repositories/${repoId}/branches`);
+      return Array.isArray(res.data) ? res.data : (res.data?.value ?? []);
+    } catch (err) {
+      console.error("[repoService] getBranches failed:", err);
+      return [];
+    }
+  },
+
   async getSummary(repoId: string) {
     try {
       const res = await apiClient.get(`/repositories/${repoId}/summary`);

@@ -44,9 +44,10 @@ export default function RepositoryWorkspaceLayout({
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       <RepositoryHeader
+        repoId={params.repoId}
         repoName={repo?.full_name || repo?.name || `Repository`}
         branch={repo?.default_branch || "main"}
-        githubUrl={repo?.github_url || "https://github.com"}
+        githubUrl={repo?.github_url || (repo?.full_name ? `https://github.com/${repo.full_name}` : "https://github.com")}
         stars={repo?.stars ?? 0}
         forks={repo?.forks ?? 0}
         onOpenSearch={() => setIsSearchOpen(true)}
