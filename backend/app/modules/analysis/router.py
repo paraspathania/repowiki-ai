@@ -50,22 +50,45 @@ def _compute_summary(repo: Repository, analysis: RepositoryAnalysis, files: List
     tech_stack = set()
     file_paths = {f.path.lower() for f in files}
 
-    if any("fastapi" in p or "app/main.py" in p for p in file_paths):
-        tech_stack.add("FastAPI")
+    # Frontend
     if any("next.config" in p or "app/layout.tsx" in p for p in file_paths):
         tech_stack.add("Next.js")
+    elif any("react" in p or p.endswith(".jsx") or p.endswith(".tsx") for p in file_paths):
+        tech_stack.add("React")
     if any("tailwind" in p for p in file_paths):
         tech_stack.add("Tailwind CSS")
-    if any("docker-compose" in p for p in file_paths):
+    if any("vite.config" in p for p in file_paths):
+        tech_stack.add("Vite")
+
+    # Backend & Runtimes
+    if any("fastapi" in p or "app/main.py" in p for p in file_paths):
+        tech_stack.add("FastAPI")
+    if any("package.json" in p or "package-lock.json" in p for p in file_paths):
+        tech_stack.add("Node.js")
+    if any("express" in p or "routes" in p or "controllers" in p for p in file_paths):
+        tech_stack.add("Express")
+
+    # Databases & Caching
+    if any("mongo" in p or "mongoose" in p for p in file_paths):
+        tech_stack.add("MongoDB")
+    if any("postgres" in p or "alembic" in p for p in file_paths):
+        tech_stack.add("PostgreSQL + pgvector")
+    if any("redis" in p for p in file_paths):
+        tech_stack.add("Redis")
+    if any("celery" in p for p in file_paths):
+        tech_stack.add("Celery")
+    if any("socket.io" in p for p in file_paths):
+        tech_stack.add("Socket.io")
+
+    # Infrastructure & Languages
+    if any("dockerfile" in p or "docker-compose" in p or "containers" in p for p in file_paths):
         tech_stack.add("Docker")
     if any(p.endswith(".py") for p in file_paths):
         tech_stack.add("Python")
     if any(p.endswith(".ts") or p.endswith(".tsx") for p in file_paths):
         tech_stack.add("TypeScript")
-    if any("postgres" in p or "alembic" in p for p in file_paths):
-        tech_stack.add("PostgreSQL + pgvector")
-    if any("celery" in p or "redis" in p for p in file_paths):
-        tech_stack.add("Celery + Redis")
+    if any(p.endswith(".js") or p.endswith(".jsx") for p in file_paths):
+        tech_stack.add("JavaScript")
 
     return {
         "repository_id": str(repo.id),
@@ -85,22 +108,53 @@ def _generate_diagram(repo: Repository, tech_stack: List[str], apis: List[Reposi
     lines = ["flowchart LR"]
     
     # 1. Client / Frontend
-    lines.append('    Client["User / Browser Client"]')
+    lines.append('    Client["User / Web Browser"]')
     if "Next.js" in tech_stack:
         lines.append('    UI["Next.js Web Interface"]')
         lines.append('    Client --> UI')
-        lines.append('    UI --> API["FastAPI Application Server"]')
+    elif "React" in tech_stack:
+        ui_label = "React Web Application" + (" (Vite)" if "Vite" in tech_stack else "")
+        lines.append(f'    UI["{ui_label}"]')
+        lines.append('    Client --> UI')
     else:
-        lines.append('    Client --> API["FastAPI Application Server"]')
+        lines.append('    Client --> API')
 
-    # 2. Database & Cache
-    lines.append('    API --> DB[("PostgreSQL (pgvector)")]')
-    if "Celery + Redis" in tech_stack:
-        lines.append('    API --> Redis[("Redis Message Queue & Cache")]')
-        lines.append('    Redis --> Worker["Celery Background Worker"]')
-        lines.append('    Worker --> DB')
+    # 2. Backend Server
+    if "Express" in tech_stack:
+        api_label = "Express.js API Server (Node.js)"
+    elif "FastAPI" in tech_stack:
+        api_label = "FastAPI Application Server (Python)"
+    else:
+        api_label = f"{repo.name} Backend Server"
+    
+    lines.append(f'    API["{api_label}"]')
+    if "Next.js" in tech_stack or "React" in tech_stack:
+        lines.append('    UI --> API')
 
-    # 3. Discovered Endpoints
+    # 3. Real-Time & Container Execution
+    if "Socket.io" in tech_stack:
+        lines.append('    Socket["Socket.io Real-time Gateway"]')
+        lines.append('    API <--> Socket')
+    if "Docker" in tech_stack:
+        lines.append('    Docker["Docker Sandbox Runner"]')
+        lines.append('    API --> Docker')
+
+    # 4. Database & Cache
+    if "MongoDB" in tech_stack:
+        lines.append('    DB[("MongoDB Database (Mongoose)")]')
+        lines.append('    API --> DB')
+    elif "PostgreSQL + pgvector" in tech_stack or any("postgres" in t.lower() for t in tech_stack):
+        lines.append('    DB[("PostgreSQL (pgvector)")]')
+        lines.append('    API --> DB')
+
+    if "Redis" in tech_stack:
+        lines.append('    Redis[("Redis In-Memory Cache")]')
+        lines.append('    API <--> Redis')
+    if "Celery" in tech_stack or "Celery + Redis" in tech_stack:
+        lines.append('    Worker["Celery Background Worker"]')
+        lines.append('    API --> Worker')
+
+    # 5. Discovered Endpoints
     if apis:
         prefix_groups: Dict[str, List[str]] = {}
         for api in apis:
