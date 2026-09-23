@@ -67,6 +67,16 @@ export const repoService = {
     }
   },
 
+  async getSummary(repoId: string) {
+    try {
+      const res = await apiClient.get(`/repositories/${repoId}/summary`);
+      return res.data;
+    } catch (err) {
+      console.error("[repoService] getSummary failed:", err);
+      return null;
+    }
+  },
+
   async getWikiSections(repoId: string) {
     try {
       const res = await apiClient.get(`/repositories/${repoId}/wiki`);
@@ -82,6 +92,18 @@ export const repoService = {
       return res.data;
     } catch {
       return MOCK_FILE_TREE;
+    }
+  },
+
+  async getFileContent(repoId: string, path: string) {
+    try {
+      const res = await apiClient.get(`/repositories/${repoId}/files/content`, {
+        params: { path },
+      });
+      return res.data;
+    } catch (err) {
+      console.error("[repoService] getFileContent failed:", err);
+      return null;
     }
   },
 
@@ -108,7 +130,7 @@ export const repoService = {
   async getApiEndpoints(repoId: string) {
     try {
       const res = await apiClient.get(`/repositories/${repoId}/apis`);
-      return res.data;
+      return Array.isArray(res.data) ? res.data : (res.data?.endpoints ?? []);
     } catch {
       return MOCK_API_ENDPOINTS;
     }

@@ -16,15 +16,19 @@ interface RepositoryHeaderProps {
 
 export function RepositoryHeader({
   repoName,
-  branch,
+  branch = "main",
   githubUrl,
-  stars = 1240,
-  forks = 182,
+  stars = 0,
+  forks = 0,
   onOpenSearch,
 }: RepositoryHeaderProps) {
   const [selectedBranch, setSelectedBranch] = useState(branch);
   const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
-  const branches = ["main", "develop", "feature/rag-pipeline", "v1.0-release"];
+  const branches = [branch, "develop"].filter((v, i, a) => a.indexOf(v) === i);
+
+  useEffect(() => {
+    if (branch) setSelectedBranch(branch);
+  }, [branch]);
 
   return (
     <header className="h-14 bg-black border-b border-white/[0.08] px-4 md:px-6 flex items-center justify-between text-xs sticky top-0 z-40">

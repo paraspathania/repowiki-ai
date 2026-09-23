@@ -12,63 +12,12 @@ import {
   Cpu, Zap, Minimize2, Maximize2, Sparkles, FileCode, ChevronUp, ChevronDown
 } from "lucide-react";
 
-const MOCK_CODE_SAMPLES: Record<string, string> = {
-  "src/app/page.tsx": `"use client";
-
-import { useState } from "react";
-import { RepositoryInput } from "@/components/repository/RepositoryInput";
-import { RepositoryPreviewCard } from "@/components/repository/RepositoryPreview";
-import { Sparkles, BookOpen, GitBranch, Cpu } from "lucide-react";
-
-export default function HomePage() {
-  const [preview, setPreview] = useState(null);
-
-  return (
-    <main className="min-h-screen relative flex flex-col justify-between p-6 bg-background">
-      <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight text-white">
-        Understand Any Repository
-      </h1>
-      <p className="text-slate-400 text-base max-w-2xl">
-        Transform software codebases into structured, navigable technical documentation.
-      </p>
-    </main>
-  );
-}`,
-  "src/components/files/CodeViewer.tsx": `"use client";
-
-import Editor from "@monaco-editor/react";
-import { Loader2 } from "lucide-react";
-
-export function CodeViewer({ code, language = "typescript" }: { code: string; language?: string }) {
-  return (
-    <div className="w-full h-full bg-[#1e1e1e]">
-      <Editor
-        height="100%"
-        defaultLanguage={language}
-        value={code}
-        theme="vs-dark"
-        options={{ readOnly: true, minimap: { enabled: true } }}
-      />
-    </div>
-  );
-}`,
-  "src/lib/api/client.ts": `import axios from "axios";
-
-export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1",
-  headers: { "Content-Type": "application/json" },
-});`,
-};
-
 export default function FileExplorerPage({ params }: { params: { repoId: string } }) {
   const [fileTree, setFileTree] = useState<FileNodeItem[]>([]);
-  const [openTabs, setOpenTabs] = useState<string[]>([
-    "src/app/page.tsx",
-    "src/components/files/CodeViewer.tsx",
-    "src/lib/api/client.ts",
-  ]);
-  const [selectedPath, setSelectedPath] = useState("src/app/page.tsx");
-  const [currentCode, setCurrentCode] = useState(MOCK_CODE_SAMPLES["src/app/page.tsx"]);
+  const [openTabs, setOpenTabs] = useState<string[]>([]);
+  const [selectedPath, setSelectedPath] = useState<string>("");
+  const [currentCode, setCurrentCode] = useState<string>("// Loading repository source files...");
+  const [codeCache, setCodeCache] = useState<Record<string, string>>({});
 
   // Compiler Console State
   const [isConsoleOpen, setIsConsoleOpen] = useState(false);
@@ -79,6 +28,22 @@ export default function FileExplorerPage({ params }: { params: { repoId: string 
     "Target AST Parser: Tree-Sitter TypeScript / Python plugin",
     "Status: Idle. Click '▶ Run Code' to execute AST build pipeline.",
   ]);
+
+  const loadCodeForPath = async (path: string) => {
+    if (codeCache[path]) {
+      setCurrentCode(codeCache[path]);
+      return;
+    }
+    setCurrentCode(`// Loading ${path}...`);
+    const fileData = await repoService.getFileContent(params.repoId, path);
+    if (fileData && typeof fileData.content === "string") {
+      setCurrentCode(fileData.content);
+      setCodeCache((prev) => ({ ...prev, [path]: fileData.content }));
+    } else {
+      const fallback = `// Could not read file content for ${path}`;
+      setCurrentCode(fallback);
+    }
+  };
 
   useEffect(() => {
     repoService.getFileTree(params.repoId).then((response: any) => {
@@ -95,6 +60,29 @@ export default function FileExplorerPage({ params }: { params: { repoId: string 
         })),
       }));
       setFileTree(mapped);
+
+      // Auto-open README.md or first available file
+      const findFirstFile = (items: FileNodeItem[]): FileNodeItem | null => {
+        const readme = items.find((i) => i.name.toLowerCase() === "readme.md");
+        if (readme && readme.type === "file") return readme;
+        for (const item of items) {
+          if (item.type === "file") return item;
+          if (item.children) {
+            const found = findFirstFile(item.children);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+
+      const initialFile = findFirstFile(mapped);
+      if (initialFile) {
+        setSelectedPath(initialFile.path);
+        setOpenTabs([initialFile.path]);
+        loadCodeForPath(initialFile.path);
+      } else {
+        setCurrentCode("// No source files found in repository");
+      }
     });
   }, [params.repoId]);
 
@@ -104,12 +92,7 @@ export default function FileExplorerPage({ params }: { params: { repoId: string 
       if (!openTabs.includes(node.path)) {
         setOpenTabs((prev) => [...prev, node.path]);
       }
-      const sample =
-        MOCK_CODE_SAMPLES[node.path] ||
-        `// Source content for ${node.path}\n\nexport function ${node.name
-          .split(".")[0]
-          .replace(/[^a-zA-Z0-9]/g, "")}() {\n  // AST Chunk Node\n  return "RepoWiki AI Grounded AST Node";\n}\n`;
-      setCurrentCode(sample);
+      loadCodeForPath(node.path);
     }
   };
 
@@ -120,7 +103,7 @@ export default function FileExplorerPage({ params }: { params: { repoId: string 
     if (selectedPath === tabPath && filtered.length > 0) {
       const nextTab = filtered[filtered.length - 1];
       setSelectedPath(nextTab);
-      setCurrentCode(MOCK_CODE_SAMPLES[nextTab] || `// Source for ${nextTab}`);
+      loadCodeForPath(nextTab);
     }
   };
 
@@ -171,9 +154,7 @@ export default function FileExplorerPage({ params }: { params: { repoId: string 
                   key={tabPath}
                   onClick={() => {
                     setSelectedPath(tabPath);
-                    setCurrentCode(
-                      MOCK_CODE_SAMPLES[tabPath] || `// Source for ${tabPath}`
-                    );
+                    loadCodeForPath(tabPath);
                   }}
                   className={`group flex items-center gap-2 px-3.5 py-2 text-xs font-mono border-r border-white/[0.06] cursor-pointer transition-all duration-150 relative ${
                     isActive

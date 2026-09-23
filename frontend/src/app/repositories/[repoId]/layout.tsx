@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { RepositoryHeader } from "@/components/layout/RepositoryHeader";
 import { RepositorySidebar } from "@/components/layout/RepositorySidebar";
 import { CommandPalette, SearchResult } from "@/components/search/CommandPalette";
+import { repoService } from "@/lib/api/client";
+import { Repository } from "@/types";
 
 export default function RepositoryWorkspaceLayout({
   children,
@@ -14,7 +16,14 @@ export default function RepositoryWorkspaceLayout({
   params: { repoId: string };
 }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [repo, setRepo] = useState<Repository | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    repoService.getRepository(params.repoId).then((data) => {
+      if (data) setRepo(data);
+    });
+  }, [params.repoId]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -35,9 +44,11 @@ export default function RepositoryWorkspaceLayout({
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       <RepositoryHeader
-        repoName={`Repository (${params.repoId})`}
-        branch="main"
-        githubUrl={`https://github.com/paraspathania/repowiki-ai`}
+        repoName={repo?.full_name || repo?.name || `Repository`}
+        branch={repo?.default_branch || "main"}
+        githubUrl={repo?.github_url || "https://github.com"}
+        stars={repo?.stars ?? 0}
+        forks={repo?.forks ?? 0}
         onOpenSearch={() => setIsSearchOpen(true)}
       />
       <div className="flex-1 flex overflow-hidden">
