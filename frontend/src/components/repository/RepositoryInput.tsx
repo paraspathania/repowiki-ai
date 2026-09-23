@@ -7,10 +7,11 @@ import { RepositoryPreview } from "@/types";
 
 interface RepositoryInputProps {
   onValidated: (preview: RepositoryPreview, url: string) => void;
+  defaultValue?: string;
 }
 
-export function RepositoryInput({ onValidated }: RepositoryInputProps) {
-  const [url, setUrl] = useState("");
+export function RepositoryInput({ onValidated, defaultValue = "" }: RepositoryInputProps) {
+  const [url, setUrl] = useState(defaultValue);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
