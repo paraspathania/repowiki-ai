@@ -287,7 +287,20 @@ async def _run_wiki_generation(repo_id_str: str, analysis_id_str: str):
             }
 
             # Check if LLM is viable
-            use_llm = bool(settings.OPENAI_API_KEY and not settings.OPENAI_API_KEY.startswith("sk-dummy") and len(settings.OPENAI_API_KEY) > 20)
+            raw_key = ""
+            if settings.OPENAI_API_KEY:
+                raw_key = (
+                    settings.OPENAI_API_KEY.get_secret_value()
+                    if hasattr(settings.OPENAI_API_KEY, "get_secret_value")
+                    else str(settings.OPENAI_API_KEY)
+                )
+
+            use_llm = bool(
+                raw_key
+                and not raw_key.startswith("sk-dummy")
+                and "***************" not in raw_key
+                and len(raw_key) > 20
+            )
             llm_provider = OpenAIProvider() if use_llm else None
 
             # Delete old sections if re-generating
@@ -305,9 +318,12 @@ async def _run_wiki_generation(repo_id_str: str, analysis_id_str: str):
                     )
                     if "OK" in test_response:
                         generation_mode = "llm"
+                    else:
+                        llm_provider = None
                 except Exception as e:
                     logger.warning("llm_unavailable_falling_back_to_ast", error=str(e))
                     generation_mode = "ast_fallback"
+                    llm_provider = None
 
             # Create sections
             for ch in CHAPTERS:
