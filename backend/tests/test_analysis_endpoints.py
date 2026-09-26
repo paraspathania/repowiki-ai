@@ -102,3 +102,19 @@ def test_generate_diagram():
     assert "Redis Message Queue" in mermaid_dsl
     assert "Celery Background Worker" in mermaid_dsl
     assert "Detected Endpoints" in mermaid_dsl
+
+
+def test_generate_diagram_redis_cache_without_celery():
+    repo = Repository(
+        id=uuid.uuid4(),
+        github_repository_id=12345,
+        owner="owner",
+        name="test-repo",
+        full_name="owner/test-repo",
+        github_url="https://github.com/owner/test-repo",
+    )
+    diagram = _generate_diagram(repo, ["FastAPI", "Redis"], [])
+
+    mermaid_dsl = diagram["mermaid"]
+    assert "Redis In-Memory Cache" in mermaid_dsl
+    assert "Celery Background Worker" not in mermaid_dsl
