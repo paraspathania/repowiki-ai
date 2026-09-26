@@ -14,7 +14,7 @@ import {
   Github,
 } from "lucide-react";
 import { Hero3DShowcase } from "@/components/home/Hero3DShowcase";
-import { UserMenu } from "@/components/auth/UserMenu";
+import { Navbar } from "@/components/layout/Navbar";
 
 const FEATURES = [
   {
@@ -97,33 +97,15 @@ const BADGE_COLOR_MAP: Record<string, string> = {
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen relative flex flex-col p-6 md:p-12 overflow-hidden bg-background">
+    <main className="min-h-screen relative flex flex-col px-4 py-2 md:px-8 md:py-4 overflow-hidden bg-background">
       {/* Background */}
       <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none z-0" />
       <div className="absolute inset-0 radial-glow pointer-events-none z-0" />
 
       {/* Nav */}
-      <nav className="relative z-20 flex items-center justify-between w-full max-w-6xl mx-auto mb-16">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors duration-200 group"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform duration-200" />
-            Back to Home
-          </Link>
-          <div className="w-px h-3 bg-white/10" />
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-indigo-400" />
-            <span className="text-sm font-bold text-white tracking-tight">
-              RepoWiki AI
-            </span>
-          </div>
-        </div>
-        <UserMenu />
-      </nav>
+      <Navbar showBackHome />
 
-      <div className="relative z-10 max-w-5xl mx-auto w-full space-y-20">
+      <div className="relative z-10 max-w-5xl mx-auto w-full space-y-16 pt-4 pb-12">
         {/* Hero */}
         <div className="text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-950/30 border border-indigo-500/20 rounded-full text-xs font-semibold text-indigo-300 backdrop-blur-md">

@@ -5,7 +5,7 @@ import { RepositoryInput } from "@/components/repository/RepositoryInput";
 import { RepositoryPreviewCard } from "@/components/repository/RepositoryPreview";
 import { RepositoryPreview } from "@/types";
 import { BookOpen, GitBranch, Cpu, Sparkles, ArrowRight } from "lucide-react";
-import { UserMenu } from "@/components/auth/UserMenu";
+import { Navbar } from "@/components/layout/Navbar";
 import Link from "next/link";
 
 const SUGGESTION_CHIPS = [
@@ -27,29 +27,13 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen relative flex flex-col px-6 py-4 md:px-12 md:py-6 overflow-hidden bg-background">
+    <main className="min-h-screen relative flex flex-col px-4 py-2 md:px-8 md:py-4 overflow-hidden bg-background">
       {/* Background patterns */}
       <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none z-0" />
       <div className="absolute inset-0 radial-glow pointer-events-none z-0" />
 
-      {/* Top Navigation Bar */}
-      <nav className="relative z-20 flex items-center justify-between w-full max-w-6xl mx-auto py-2">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-indigo-400" />
-          <span className="text-sm font-bold text-white tracking-tight">
-            RepoWiki AI
-          </span>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link
-            href="/about"
-            className="text-xs text-slate-400 hover:text-white transition-colors duration-200"
-          >
-            About
-          </Link>
-          <UserMenu />
-        </div>
-      </nav>
+      {/* Top Navigation Bar - Minimal Obsidian Bar */}
+      <Navbar />
 
       {/* Hero Section */}
       <div className="relative z-10 max-w-4xl mx-auto w-full flex flex-col items-center text-center gap-6 pt-4 md:pt-8 pb-12">
