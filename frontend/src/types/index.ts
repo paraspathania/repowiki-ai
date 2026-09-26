@@ -116,6 +116,7 @@ export interface ApiEndpoint {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   path: string;
   description: string;
+  file_path?: string;
   protocol: 'REST' | 'GraphQL' | 'WebSocket';
   authRequired: boolean;
   requestBody?: string;
