@@ -195,6 +195,7 @@ export default function RepositoryOverviewPage({ params }: { params: { repoId: s
   const sizeBytes = summary?.repository_size_bytes ?? repo.size_bytes ?? 0;
   const totalApis = summary?.endpoints_count ?? endpoints.length ?? 0;
   const totalDeps = dependencies.length || 0;
+  const contributorsCount = repo.contributors_count ?? 0;
 
   return (
     <div className="h-full overflow-y-auto p-6 md:p-8 space-y-8 bg-[#07090e] custom-scrollbar">
@@ -312,7 +313,7 @@ export default function RepositoryOverviewPage({ params }: { params: { repoId: s
             icon={Users}
             iconColor="text-emerald-400"
             label="Contributors"
-            value={repo.contributors_count > 0 ? repo.contributors_count.toLocaleString() : "1"}
+            value={contributorsCount > 0 ? contributorsCount.toLocaleString() : "1"}
             subtext="contributors"
           />
           <StatCard
