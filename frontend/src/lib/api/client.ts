@@ -58,6 +58,16 @@ export const repoService = {
     }
   },
 
+  async updateRepository(repoId: string, data: { default_branch?: string; description?: string }) {
+    try {
+      const res = await apiClient.patch(`/repositories/${repoId}`, data);
+      return res.data;
+    } catch (err) {
+      console.error("[repoService] updateRepository failed:", err);
+      throw err;
+    }
+  },
+
   async refreshRepositoryStats(repoId: string) {
     try {
       const res = await apiClient.get(`/repositories/${repoId}/refresh-stats`);

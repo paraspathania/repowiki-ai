@@ -7,6 +7,7 @@ from app.modules.repositories.models import RepositoryVisibility
 
 class RepositoryValidateRequest(BaseModel):
     repo_url: str = Field(..., json_schema_extra={"example": "https://github.com/facebook/react"})
+    branch: Optional[str] = None
 
 
 class RepositoryPreview(BaseModel):
@@ -28,6 +29,11 @@ class RepositoryCreate(BaseModel):
     repo_url: str
     branch: Optional[str] = None
     selected_path: Optional[str] = "/"
+
+
+class RepositoryUpdate(BaseModel):
+    default_branch: Optional[str] = None
+    description: Optional[str] = None
 
 
 class RepositoryOut(BaseModel):

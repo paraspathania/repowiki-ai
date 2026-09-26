@@ -22,6 +22,7 @@ export function RepositoryPreviewCard({ preview, repoUrl }: RepositoryPreviewPro
     try {
       const res = await apiClient.post("/repository/analyze", {
         repo_url: repoUrl,
+        branch: selectedBranch,
       });
       const analysisId = res.data.analysis_id;
       router.push(`/analyses/${analysisId}/progress`);
@@ -34,8 +35,8 @@ export function RepositoryPreviewCard({ preview, repoUrl }: RepositoryPreviewPro
   const formattedSize = (preview.size_bytes / (1024 * 1024)).toFixed(1);
 
   return (
-    <div className="w-full max-w-2xl mx-auto glass-panel rounded-2xl p-6 space-y-6 shadow-2xl animate-fade-in relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+    <div className="w-full max-w-2xl mx-auto glass-panel rounded-2xl p-6 space-y-6 shadow-2xl animate-fade-in relative">
+      <div className="absolute top-0 left-0 right-0 h-[1px] rounded-t-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
       
       <div className="flex items-start justify-between">
         <div className="space-y-2">

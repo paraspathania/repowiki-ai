@@ -12,6 +12,7 @@ from app.modules.repositories.schemas import (
     RepositoryValidateRequest,
     RepositoryPreview,
     RepositoryCreate,
+    RepositoryUpdate,
     RepositoryOut,
     BranchOut,
 )
@@ -64,6 +65,27 @@ async def get_repository(
     repo = await db.get(Repository, repo_id)
     if not repo or repo.deleted_at:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Repository not found")
+    return RepositoryOut.model_validate(repo)
+
+
+@router.patch("/repositories/{repo_id}", response_model=RepositoryOut)
+async def update_repository(
+    repo_id: uuid.UUID,
+    req: RepositoryUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
+    repo = await db.get(Repository, repo_id)
+    if not repo or repo.deleted_at:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Repository not found")
+
+    if req.default_branch is not None:
+        repo.default_branch = req.default_branch.strip()
+    if req.description is not None:
+        repo.description = req.description.strip()
+
+    await db.commit()
+    await db.refresh(repo)
     return RepositoryOut.model_validate(repo)
 
 
@@ -159,9 +181,10 @@ async def analyze_repository_legacy(
         owner_user_id=user_id,
     )
 
+    target_branch = req.branch or repo.default_branch
     analysis = RepositoryAnalysis(
         repository_id=repo.id,
-        branch=repo.default_branch,
+        branch=target_branch,
         status=AnalysisStatus.QUEUED,
         progress=0,
     )
@@ -174,7 +197,7 @@ async def analyze_repository_legacy(
         clone_repository.delay(
             analysis_id=str(analysis.id),
             repo_url=repo.github_url,
-            branch=repo.default_branch,
+            branch=target_branch,
         )
     except Exception:
         # Fallback for dev environment if Celery worker is not connected directly

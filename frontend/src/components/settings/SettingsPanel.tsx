@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSettings, WebsiteTheme, ExplanationMode } from "@/lib/settings-context";
+import { repoService } from "@/lib/api/client";
 import {
   Settings,
   Globe,
@@ -18,6 +19,8 @@ import {
   Sliders,
   CheckCircle2,
   Lock,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 
 interface SettingsPanelProps {
@@ -28,10 +31,45 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
   const { settings, updateSettings } = useSettings();
   const [activeTab, setActiveTab] = useState<"general" | "ai" | "security" | "exports" | "integrations">("general");
   const [saved, setSaved] = useState<boolean>(false);
+  const [saving, setSaving] = useState<boolean>(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [repoData, setRepoData] = useState<any>(null);
+  const [defaultBranchInput, setDefaultBranchInput] = useState<string>("");
 
-  const handleSaveSettings = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  useEffect(() => {
+    if (!repoId) return;
+    repoService.getRepository(repoId).then((data) => {
+      if (data) {
+        setRepoData(data);
+        setDefaultBranchInput(data.default_branch || settings.defaultBranch || "main");
+      } else {
+        setDefaultBranchInput(settings.defaultBranch || "main");
+      }
+    });
+  }, [repoId, settings.defaultBranch]);
+
+  const handleSaveSettings = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const branchToSave = defaultBranchInput.trim() || "main";
+      // 1. Persist updated default_branch to backend PostgreSQL database
+      if (repoId) {
+        await repoService.updateRepository(repoId, {
+          default_branch: branchToSave,
+        });
+      }
+      // 2. Persist local website preferences
+      updateSettings({ defaultBranch: branchToSave });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err: any) {
+      console.error("Failed to save settings:", err);
+      const msg = err.response?.data?.detail || "Failed to save repository settings. Please try again.";
+      setSaveError(msg);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const themesList: { id: WebsiteTheme; name: string; desc: string; badge: string; border: string; bgGradient: string }[] = [
@@ -78,8 +116,8 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
                 <h1 className="text-lg md:text-xl font-extrabold bg-gradient-to-r from-white via-slate-100 to-indigo-200 bg-clip-text text-transparent tracking-tight">
                   Website & Repository Settings
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] bg-indigo-500/20 text-indigo-300 font-mono border border-indigo-500/30 font-semibold">
-                  {repoId}
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] bg-indigo-500/20 text-indigo-300 font-mono border border-indigo-500/30 font-semibold" title={repoId}>
+                  {repoData?.full_name || repoId}
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-1">
@@ -90,13 +128,19 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
 
           <button
             onClick={handleSaveSettings}
+            disabled={saving}
             className={`px-6 py-3 rounded-xl font-bold text-xs shadow-sm transition-all duration-200 flex items-center gap-2.5 ${
               saved
                 ? "bg-emerald-600 text-white shadow-emerald-600/30 ring-2 ring-emerald-400/50"
-                : "bg-white hover:bg-neutral-200 text-neutral-950 active:scale-[0.98]"
+                : "bg-white hover:bg-neutral-200 text-neutral-950 active:scale-[0.98] disabled:opacity-60"
             }`}
           >
-            {saved ? (
+            {saving ? (
+              <>
+                <Loader2 className="w-4 h-4 text-neutral-950 animate-spin" />
+                <span>Saving...</span>
+              </>
+            ) : saved ? (
               <>
                 <CheckCircle2 className="w-4 h-4 text-white" />
                 <span>Settings Saved!</span>
@@ -110,6 +154,13 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
           </button>
         </div>
       </div>
+
+      {saveError && (
+        <div className="flex items-center gap-3 p-4 bg-red-950/30 border border-red-500/30 rounded-2xl text-red-300 text-xs backdrop-blur-md animate-fade-in">
+          <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+          <span>{saveError}</span>
+        </div>
+      )}
 
       {/* Main Settings Section */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -235,8 +286,9 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
                 <div className="relative">
                   <input
                     type="text"
-                    value={settings.defaultBranch}
-                    onChange={(e) => updateSettings({ defaultBranch: e.target.value })}
+                    value={defaultBranchInput}
+                    onChange={(e) => setDefaultBranchInput(e.target.value)}
+                    placeholder="e.g. main"
                     className="w-full p-3 rounded-2xl bg-white/[0.03] border border-white/[0.1] text-white font-mono text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono px-2 py-0.5 bg-indigo-500/20 text-indigo-300 rounded-md">
