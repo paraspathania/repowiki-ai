@@ -147,10 +147,14 @@ def _generate_diagram(repo: Repository, tech_stack: List[str], apis: List[Reposi
         lines.append('    DB[("PostgreSQL (pgvector)")]')
         lines.append('    API --> DB')
 
-    if "Redis" in tech_stack:
-        lines.append('    Redis[("Redis In-Memory Cache")]')
+    has_redis = any("redis" in t.lower() for t in tech_stack)
+    has_celery = any("celery" in t.lower() for t in tech_stack)
+
+    if has_redis:
+        redis_label = "Redis Message Queue" if has_celery else "Redis In-Memory Cache"
+        lines.append(f'    Redis[("{redis_label}")]')
         lines.append('    API <--> Redis')
-    if "Celery" in tech_stack or "Celery + Redis" in tech_stack:
+    if has_celery:
         lines.append('    Worker["Celery Background Worker"]')
         lines.append('    API --> Worker')
 
