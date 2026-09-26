@@ -312,7 +312,7 @@ export default function RepositoryOverviewPage({ params }: { params: { repoId: s
             icon={Users}
             iconColor="text-emerald-400"
             label="Contributors"
-            value={repo.contributors_count > 0 ? repo.contributors_count.toLocaleString() : "1"}
+            value={(repo.contributors_count ?? 0) > 0 ? (repo.contributors_count ?? 1).toLocaleString() : "1"}
             subtext="contributors"
           />
           <StatCard

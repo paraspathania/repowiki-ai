@@ -35,7 +35,7 @@ export function RepositoryPreviewCard({ preview, repoUrl }: RepositoryPreviewPro
 
   return (
     <div className="w-full max-w-2xl mx-auto glass-panel rounded-2xl p-6 space-y-6 shadow-2xl animate-fade-in relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
       
       <div className="flex items-start justify-between">
         <div className="space-y-2">
@@ -86,16 +86,16 @@ export function RepositoryPreviewCard({ preview, repoUrl }: RepositoryPreviewPro
         <button
           onClick={handleStartAnalysis}
           disabled={starting}
-          className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold rounded-xl flex items-center justify-center gap-2.5 transition duration-300 shadow-xl shadow-indigo-500/10 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none shimmer-btn text-base"
+          className="w-full py-4 bg-white hover:bg-neutral-200 text-neutral-950 font-semibold rounded-xl flex items-center justify-center gap-2.5 transition-all duration-200 shadow-sm hover:shadow active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none text-base"
         >
           {starting ? (
             <>
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="w-5 h-5 animate-spin text-neutral-950" />
               <span>Starting Analysis...</span>
             </>
           ) : (
             <>
-              <Play className="w-5 h-5 fill-current" />
+              <Play className="w-5 h-5 fill-current text-neutral-950" />
               <span>Analyze Repository</span>
             </>
           )}

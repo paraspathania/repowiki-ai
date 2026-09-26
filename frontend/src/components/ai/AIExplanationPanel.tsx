@@ -41,7 +41,7 @@ export function AIExplanationPanel({ repoId, selectedPath, codeSnippet, onCitati
       {/* Copilot / IDE Assistant Header */}
       <div className="p-3.5 border-b border-white/[0.08] bg-[#0c101c] flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-500/20">
+          <div className="w-6 h-6 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center shadow-sm">
             <Bot className="w-3.5 h-3.5 text-white" />
           </div>
           <div>
@@ -75,16 +75,16 @@ export function AIExplanationPanel({ repoId, selectedPath, codeSnippet, onCitati
         <button
           onClick={fetchExplanation}
           disabled={loading || !selectedPath}
-          className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-mono font-bold rounded-xl flex items-center justify-center gap-2 transition duration-200 shadow-lg shadow-indigo-600/20 disabled:opacity-40"
+          className="w-full py-3 bg-white hover:bg-neutral-200 text-neutral-950 text-xs font-mono font-bold rounded-xl flex items-center justify-center gap-2 transition duration-200 shadow-sm disabled:opacity-40 active:scale-[0.98]"
         >
           {loading ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin text-neutral-950" />
               <span>Parsing Code AST & RAG...</span>
             </>
           ) : (
             <>
-              <Sparkles className="w-4 h-4 text-amber-300" />
+              <Sparkles className="w-4 h-4 text-neutral-950" />
               <span>Explain {fileName}</span>
             </>
           )}

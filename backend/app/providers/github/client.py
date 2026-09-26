@@ -17,7 +17,7 @@ class GitHubClient:
 
     async def get_repo_metadata(self, owner: str, repo: str) -> GitHubRepoMetadata:
         url = f"{self.BASE_URL}/repos/{owner}/{repo}"
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
             response = await client.get(url, headers=self.headers, timeout=10.0)
             
             if response.status_code == 404:
@@ -47,7 +47,7 @@ class GitHubClient:
 
     async def get_repo_branches(self, owner: str, repo: str) -> List[GitHubBranch]:
         url = f"{self.BASE_URL}/repos/{owner}/{repo}/branches"
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
             response = await client.get(url, headers=self.headers, timeout=10.0)
             if response.status_code != 200:
                 return []

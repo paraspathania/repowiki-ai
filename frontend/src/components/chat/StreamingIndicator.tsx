@@ -7,12 +7,12 @@ export function StreamingIndicator() {
   return (
     <div className="flex justify-start w-full">
       <div className="max-w-[85%] flex items-start gap-3">
-        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 ring-2 ring-indigo-500/30 mt-1 shadow-lg shadow-indigo-500/20 animate-pulse">
+        <div className="w-7 h-7 rounded-full bg-white/10 border border-white/15 flex items-center justify-center flex-shrink-0 ring-1 ring-white/20 mt-1 shadow-sm">
           <Sparkles className="w-3.5 h-3.5 text-white" />
         </div>
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-extrabold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+            <span className="text-[11px] font-bold text-white">
               RepoWiki AI
             </span>
             <span className="text-[10px] text-slate-500 font-mono">is thinking...</span>

@@ -141,7 +141,7 @@ export default function AboutPage() {
           <div className="flex items-center justify-center gap-4 pt-2">
             <Link
               href="/"
-              className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-full font-semibold text-sm transition duration-300 shadow-lg shadow-indigo-500/20"
+              className="px-6 py-3 bg-white hover:bg-neutral-200 text-neutral-950 rounded-full font-semibold text-sm transition-all duration-200 shadow-sm hover:shadow active:scale-95"
             >
               Analyze a Repository
             </Link>
@@ -210,7 +210,7 @@ export default function AboutPage() {
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-full font-semibold transition duration-300 shadow-lg shadow-indigo-500/20"
+            className="inline-flex items-center gap-2 px-8 py-3.5 bg-white hover:bg-neutral-200 text-neutral-950 rounded-full font-semibold transition-all duration-200 shadow-sm hover:shadow active:scale-95"
           >
             Get Started — It&apos;s Free
           </Link>

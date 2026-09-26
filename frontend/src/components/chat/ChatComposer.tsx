@@ -61,8 +61,8 @@ export function ChatComposer({ onSend, isStreaming, suggestions = [] }: ChatComp
 
       {/* Input Bar */}
       <div className="relative group">
-        <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-indigo-500/20 rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 blur-sm" />
-        <div className="relative flex items-end gap-3 bg-[#0d101a] border border-white/[0.1] rounded-full px-4 py-2.5 group-focus-within:border-indigo-500/40 transition-all duration-200 shadow-xl shadow-black/20">
+        <div className="absolute -inset-[1px] bg-white/10 rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 blur-sm" />
+        <div className="relative flex items-end gap-3 bg-[#0d101a] border border-white/[0.1] rounded-full px-4 py-2.5 group-focus-within:border-white/30 transition-all duration-200 shadow-xl shadow-black/20">
           {/* Left side actions */}
           <button className="p-2 rounded-xl text-slate-500 hover:text-slate-300 hover:bg-white/[0.06] transition flex-shrink-0 mb-0.5" title="Attach context file">
             <Paperclip className="w-4 h-4" />
@@ -83,16 +83,16 @@ export function ChatComposer({ onSend, isStreaming, suggestions = [] }: ChatComp
           <button
             onClick={handleSend}
             disabled={!text.trim() || isStreaming}
-            className={`p-2.5 rounded-xl transition-all duration-200 flex items-center justify-center flex-shrink-0 mb-0.5 ${
+            className={`p-2.5 rounded-full transition-all duration-200 flex items-center justify-center flex-shrink-0 mb-0.5 ${
               text.trim() && !isStreaming
-                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30 hover:scale-[1.05] active:scale-[0.95]"
+                ? "bg-white text-neutral-950 shadow-md hover:bg-neutral-200 active:scale-95"
                 : "bg-white/[0.04] text-slate-600 cursor-not-allowed"
             }`}
           >
             {isStreaming ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin text-neutral-950" />
             ) : (
-              <ArrowUp className="w-4 h-4" />
+              <ArrowUp className="w-4 h-4 text-neutral-950" />
             )}
           </button>
         </div>

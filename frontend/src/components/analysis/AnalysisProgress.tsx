@@ -96,10 +96,10 @@ export function AnalysisProgressCard({ event, analysisId, repoId }: AnalysisProg
         <div className="pt-4 border-t border-white/[0.06]">
           <Link
             href={targetRepoId ? `/repositories/${targetRepoId}/overview` : `/dashboard`}
-            className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold rounded-xl flex items-center justify-center gap-2.5 transition duration-300 shadow-xl shadow-indigo-500/15 active:scale-[0.99] shimmer-btn"
+            className="w-full py-4 bg-white hover:bg-neutral-200 text-neutral-950 font-semibold rounded-xl flex items-center justify-center gap-2.5 transition-all duration-200 shadow-sm hover:shadow active:scale-[0.99]"
           >
             <span>Open Repository Workspace</span>
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-5 h-5 text-neutral-950" />
           </Link>
         </div>
       )}

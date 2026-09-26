@@ -36,7 +36,7 @@ export function RepositoryInput({ onValidated, defaultValue = "" }: RepositoryIn
       });
       onValidated(res.data, url.trim());
     } catch (err: any) {
-      const msg = err.response?.data?.error?.message || "Failed to validate repository. Ensure it exists and is accessible.";
+      const msg = err.response?.data?.error?.message || err.response?.data?.detail || err.message || "Failed to validate repository. Ensure it exists and is accessible.";
       setError(msg);
     } finally {
       setLoading(false);
@@ -45,7 +45,7 @@ export function RepositoryInput({ onValidated, defaultValue = "" }: RepositoryIn
 
   return (
     <form onSubmit={handleValidate} className="w-full max-w-2xl mx-auto space-y-4">
-      <div className="relative flex items-center bg-panel/40 border border-white/[0.08] focus-within:border-indigo-500/40 rounded-full p-1.5 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-300 shadow-2xl backdrop-blur-md">
+      <div className="relative flex items-center bg-panel/40 border border-white/[0.08] focus-within:border-white/30 rounded-full p-1.5 focus-within:ring-4 focus-within:ring-white/10 transition-all duration-300 shadow-2xl backdrop-blur-md">
         <div className="absolute left-6 text-slate-400">
           <Search className="w-5 h-5" />
         </div>
@@ -60,17 +60,17 @@ export function RepositoryInput({ onValidated, defaultValue = "" }: RepositoryIn
         <button
           type="submit"
           disabled={loading}
-          className="absolute right-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-full font-semibold flex items-center gap-2 transition duration-300 shadow-lg shadow-indigo-500/20 active:scale-95 disabled:opacity-50 disabled:pointer-events-none shimmer-btn"
+          className="absolute right-2 px-6 py-3 bg-white hover:bg-neutral-200 text-neutral-950 rounded-full font-semibold flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
         >
           {loading ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin text-neutral-950" />
               <span>Checking...</span>
             </>
           ) : (
             <>
               <span>Analyze</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 text-neutral-950" />
             </>
           )}
         </button>

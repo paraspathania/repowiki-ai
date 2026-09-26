@@ -118,6 +118,7 @@ export interface ApiEndpoint {
   description: string;
   protocol: 'REST' | 'GraphQL' | 'WebSocket';
   authRequired: boolean;
+  file_path?: string;
   requestBody?: string;
   responseBody?: string;
   headers?: Record<string, string>;

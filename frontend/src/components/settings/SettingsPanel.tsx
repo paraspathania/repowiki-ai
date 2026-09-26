@@ -90,10 +90,10 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
 
           <button
             onClick={handleSaveSettings}
-            className={`px-6 py-3 rounded-2xl font-bold text-xs shadow-xl transition-all duration-300 flex items-center gap-2.5 ${
+            className={`px-6 py-3 rounded-xl font-bold text-xs shadow-sm transition-all duration-200 flex items-center gap-2.5 ${
               saved
                 ? "bg-emerald-600 text-white shadow-emerald-600/30 ring-2 ring-emerald-400/50"
-                : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-indigo-600/30 hover:scale-[1.02] active:scale-[0.98]"
+                : "bg-white hover:bg-neutral-200 text-neutral-950 active:scale-[0.98]"
             }`}
           >
             {saved ? (
@@ -103,7 +103,7 @@ export function SettingsPanel({ repoId }: SettingsPanelProps) {
               </>
             ) : (
               <>
-                <Save className="w-4 h-4" />
+                <Save className="w-4 h-4 text-neutral-950" />
                 <span>Save Preferences</span>
               </>
             )}

@@ -224,18 +224,18 @@ export function LearningHub({ quizzes, flashcards, roadmap }: LearningHubProps) 
                 <button
                   onClick={handleSubmitAnswer}
                   disabled={selectedAnswer === null}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:opacity-30 disabled:cursor-not-allowed text-white font-mono font-bold text-xs shadow-lg shadow-indigo-600/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed text-neutral-950 font-mono font-bold text-xs shadow-sm transition-all duration-200 active:scale-[0.98]"
                 >
-                  <Play className="w-3.5 h-3.5" />
+                  <Play className="w-3.5 h-3.5 text-neutral-950" />
                   <span>run test()</span>
                 </button>
               ) : (
                 <button
                   onClick={handleNextQuiz}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-mono font-bold text-xs shadow-lg shadow-indigo-600/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-neutral-200 text-neutral-950 font-mono font-bold text-xs shadow-sm transition-all duration-200 active:scale-[0.98]"
                 >
                   <span>{currentQuizIndex < quizzes.length - 1 ? "next()" : "finish()"}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-3.5 h-3.5 text-neutral-950" />
                 </button>
               )}
             </div>
@@ -342,10 +342,10 @@ export function LearningHub({ quizzes, flashcards, roadmap }: LearningHubProps) 
                 setCurrentFlashcardIndex((i) => Math.min(flashcards.length - 1, i + 1));
               }}
               disabled={currentFlashcardIndex === flashcards.length - 1}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:opacity-20 text-white text-xs font-mono font-bold shadow-lg shadow-indigo-600/20 transition"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-neutral-200 disabled:opacity-20 text-neutral-950 text-xs font-mono font-bold shadow-sm transition-all active:scale-95"
             >
               <span>next()</span>
-              <ArrowRight className="w-3 h-3" />
+              <ArrowRight className="w-3 h-3 text-neutral-950" />
             </button>
           </div>
         </div>
@@ -368,11 +368,11 @@ export function LearningHub({ quizzes, flashcards, roadmap }: LearningHubProps) 
                 <div key={step.step} className="relative flex gap-4">
                   {/* Vertical connector line */}
                   <div className="flex flex-col items-center flex-shrink-0">
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white flex items-center justify-center font-mono font-extrabold text-xs shadow-lg shadow-indigo-600/30 relative z-10">
+                    <div className="w-8 h-8 rounded-xl bg-neutral-800 border border-white/20 text-white flex items-center justify-center font-mono font-extrabold text-xs shadow-md relative z-10">
                       {step.step}
                     </div>
                     {idx < roadmap.length - 1 && (
-                      <div className="w-px flex-1 bg-gradient-to-b from-indigo-500/40 to-transparent my-1" />
+                      <div className="w-px flex-1 bg-white/20 my-1" />
                     )}
                   </div>
 

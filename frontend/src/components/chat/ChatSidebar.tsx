@@ -23,9 +23,9 @@ export function ChatSidebar({ sessions, activeSessionId, onNewChat, onSelectSess
       <div className="p-4">
         <button
           onClick={onNewChat}
-          className="w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs shadow-xl shadow-indigo-600/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+          className="w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl bg-white hover:bg-neutral-200 text-neutral-950 font-bold text-xs shadow-sm transition-all duration-200 active:scale-[0.98]"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 text-neutral-950" />
           <span>New Thread</span>
         </button>
       </div>
@@ -46,11 +46,11 @@ export function ChatSidebar({ sessions, activeSessionId, onNewChat, onSelectSess
               onClick={() => onSelectSession(session.id)}
               className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-3 transition-all duration-150 group ${
                 isActive
-                  ? "bg-gradient-to-r from-indigo-600/25 to-purple-600/15 border border-indigo-500/40 text-white shadow-md shadow-indigo-500/10"
+                  ? "bg-white/[0.08] border border-white/20 text-white shadow-sm"
                   : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
               }`}
             >
-              <MessageSquare className={`w-3.5 h-3.5 flex-shrink-0 ${isActive ? "text-indigo-400" : "text-slate-500 group-hover:text-slate-300"}`} />
+              <MessageSquare className={`w-3.5 h-3.5 flex-shrink-0 ${isActive ? "text-white" : "text-slate-500 group-hover:text-slate-300"}`} />
               <div className="flex flex-col overflow-hidden min-w-0">
                 <span className="text-xs font-semibold truncate">{session.title || "New conversation"}</span>
                 <span className="flex items-center gap-1 text-[10px] text-slate-600 mt-0.5">

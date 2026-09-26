@@ -216,7 +216,7 @@ function UserAvatar({ isExpanded }: { isExpanded: boolean }) {
       } rounded-xl hover:bg-white/[0.04] transition-all duration-200`}
       onClick={signOut}
     >
-      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-[9px] font-bold text-white ring-1 ring-white/20 flex-shrink-0">
+      <div className="w-6 h-6 rounded-full bg-neutral-700 border border-white/20 flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0">
         {initials}
       </div>
       {isExpanded && <span className="text-xs font-semibold text-slate-300 truncate">Sign Out ({user?.name})</span>}

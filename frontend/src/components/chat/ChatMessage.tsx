@@ -109,10 +109,10 @@ export function ChatMessage({ message }: ChatMessageProps) {
     return (
       <div className="flex justify-end w-full">
         <div className="max-w-[75%] flex items-start gap-3">
-          <div className="px-5 py-3.5 rounded-2xl rounded-br-md bg-gradient-to-r from-indigo-600/90 to-purple-600/80 border border-indigo-500/30 text-white text-[13px] shadow-lg shadow-indigo-600/10">
+          <div className="px-5 py-3.5 rounded-2xl rounded-br-md bg-neutral-800/90 border border-white/15 text-white text-[13px] shadow-md">
             <MarkdownRenderer content={message.content} />
           </div>
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center flex-shrink-0 ring-2 ring-white/10 mt-1">
+          <div className="w-7 h-7 rounded-full bg-neutral-700 flex items-center justify-center flex-shrink-0 ring-1 ring-white/15 mt-1">
             <User className="w-3.5 h-3.5 text-slate-300" />
           </div>
         </div>
@@ -123,13 +123,13 @@ export function ChatMessage({ message }: ChatMessageProps) {
   return (
     <div className="flex justify-start w-full">
       <div className="max-w-[85%] flex items-start gap-3">
-        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 ring-2 ring-indigo-500/30 mt-1 shadow-lg shadow-indigo-500/20">
+        <div className="w-7 h-7 rounded-full bg-white/10 border border-white/15 flex items-center justify-center flex-shrink-0 ring-1 ring-white/20 mt-1 shadow-sm">
           <Sparkles className="w-3.5 h-3.5 text-white" />
         </div>
         <div className="flex flex-col gap-2 min-w-0">
           {/* Header */}
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-extrabold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+            <span className="text-[11px] font-bold text-white">
               RepoWiki AI
             </span>
             <span className="text-[10px] text-slate-600 font-mono">•</span>
