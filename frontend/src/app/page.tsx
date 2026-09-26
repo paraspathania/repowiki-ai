@@ -27,13 +27,13 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen relative flex flex-col justify-between p-6 md:p-12 overflow-hidden bg-background">
+    <main className="min-h-screen relative flex flex-col px-6 py-4 md:px-12 md:py-6 overflow-hidden bg-background">
       {/* Background patterns */}
       <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none z-0" />
       <div className="absolute inset-0 radial-glow pointer-events-none z-0" />
 
       {/* Top Navigation Bar */}
-      <nav className="relative z-20 flex items-center justify-between w-full max-w-6xl mx-auto">
+      <nav className="relative z-20 flex items-center justify-between w-full max-w-6xl mx-auto py-2">
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-indigo-400" />
           <span className="text-sm font-bold text-white tracking-tight">
@@ -52,7 +52,7 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <div className="relative z-10 max-w-4xl mx-auto w-full flex-1 flex flex-col justify-center items-center text-center gap-8 py-16">
+      <div className="relative z-10 max-w-4xl mx-auto w-full flex flex-col items-center text-center gap-6 pt-4 md:pt-8 pb-12">
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-950/30 border border-indigo-500/20 rounded-full text-xs font-semibold text-indigo-300 backdrop-blur-md shadow-lg shadow-indigo-950/20 animate-fade-in">
           <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
@@ -164,7 +164,7 @@ export default function HomePage() {
       </div>
 
       {/* Footer */}
-      <footer className="relative z-10 text-center text-slate-600 text-xs py-6 border-t border-white/[0.04] w-full max-w-5xl mx-auto flex items-center justify-between">
+      <footer className="relative z-10 text-center text-slate-600 text-xs py-6 mt-auto border-t border-white/[0.04] w-full max-w-5xl mx-auto flex items-center justify-between">
         <span>RepoWiki AI — Modular Monolith Architecture</span>
         <span className="flex items-center gap-1.5 text-slate-600">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
