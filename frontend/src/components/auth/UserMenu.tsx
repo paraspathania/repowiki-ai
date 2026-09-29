@@ -5,7 +5,7 @@ import { LogIn, LogOut, User, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
 export function UserMenu() {
-  const { user, isAuthenticated, openAuthModal, signOut } = useAuth();
+  const { user, isAuthenticated, openAuthModal, openProfileModal, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -24,6 +24,7 @@ export function UserMenu() {
     return (
       <button
         onClick={openAuthModal}
+        id="user-menu-signin-btn"
         className="flex items-center gap-2 px-3.5 py-1.5 bg-white hover:bg-gray-100 text-gray-900 font-semibold text-xs rounded-lg transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.97]"
       >
         <LogIn className="w-3.5 h-3.5" />
@@ -51,8 +52,11 @@ export function UserMenu() {
     <div ref={menuRef} className="relative">
       {/* Avatar Trigger */}
       <button
+        id="user-menu-trigger"
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 group"
+        aria-label="User Menu"
+        aria-expanded={isOpen}
       >
         <div
           className={`w-7 h-7 rounded-full bg-gradient-to-br ${
@@ -83,7 +87,14 @@ export function UserMenu() {
 
           {/* Menu Items */}
           <div className="p-1.5">
-            <button className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-150">
+            <button
+              id="user-menu-profile-btn"
+              onClick={() => {
+                openProfileModal();
+                setIsOpen(false);
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-150 text-left"
+            >
               <User className="w-3.5 h-3.5" />
               <span>Profile</span>
             </button>
@@ -91,11 +102,12 @@ export function UserMenu() {
             <div className="h-px bg-white/[0.06] my-1" />
 
             <button
+              id="user-menu-signout-btn"
               onClick={() => {
                 signOut();
                 setIsOpen(false);
               }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/[0.06] rounded-lg transition-all duration-150"
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/[0.06] rounded-lg transition-all duration-150 text-left"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>

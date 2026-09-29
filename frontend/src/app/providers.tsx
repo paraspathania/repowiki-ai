@@ -5,6 +5,7 @@ import { useState } from "react";
 import { AuthProvider } from "@/lib/auth-context";
 import { SettingsProvider } from "@/lib/settings-context";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { ProfileModal } from "@/components/auth/ProfileModal";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -25,6 +26,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <SettingsProvider>
           {children}
           <AuthModal />
+          <ProfileModal />
         </SettingsProvider>
       </AuthProvider>
     </QueryClientProvider>
