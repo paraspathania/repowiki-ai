@@ -28,7 +28,7 @@ export function CodeViewer({ code, language = "typescript", selectedPath = "" }:
   const charCount = code.length;
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#0b0e17] relative">
+    <div className="w-full h-full flex flex-col bg-[#111111] relative">
       {/* Monaco Editor Container */}
       <div className="flex-1 relative overflow-hidden">
         <Editor
@@ -54,35 +54,35 @@ export function CodeViewer({ code, language = "typescript", selectedPath = "" }:
             bracketPairColorization: { enabled: true },
           }}
           loading={
-            <div className="flex flex-col items-center justify-center h-full text-slate-400 gap-3 bg-[#0b0e17]">
-              <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
-              <span className="text-xs font-mono">Initializing Monaco Compiler Engine...</span>
+            <div className="flex flex-col items-center justify-center h-full text-[#A3A3A3] gap-2.5 bg-[#111111]">
+              <Loader2 className="w-5 h-5 animate-spin text-[#F2F2F2]" />
+              <span className="text-xs font-mono text-[#777777]">Loading file...</span>
             </div>
           }
         />
       </div>
 
       {/* IDE Status Bar */}
-      <div className="h-7 bg-[#070910] border-t border-white/[0.08] px-3 flex items-center justify-between text-[11px] font-mono text-slate-500 select-none flex-shrink-0">
+      <div className="h-7 bg-[#111111] border-t border-[#2A2A2A] px-3 flex items-center justify-between text-[11px] font-mono text-[#777777] select-none flex-shrink-0">
         {/* Left Status info */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 text-indigo-400">
-            <Cpu className="w-3 h-3" />
-            <span className="font-bold">Tree-Sitter AST</span>
+          <div className="flex items-center gap-1.5 text-[#A3A3A3]">
+            <Cpu className="w-3 h-3 text-[#777777]" />
+            <span className="font-medium text-[#F2F2F2]">Tree-Sitter AST</span>
           </div>
           <span>Ln {lineCount}, Ch {charCount}</span>
           <span>UTF-8</span>
-          <span className="text-slate-400 font-bold uppercase">{getMonacoLanguage(language)}</span>
+          <span className="text-[#A3A3A3] font-medium uppercase">{getMonacoLanguage(language)}</span>
         </div>
 
         {/* Right Status info */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1 text-emerald-400">
-            <CheckCircle2 className="w-3 h-3" />
+          <div className="flex items-center gap-1.5 text-[#A3A3A3]">
+            <CheckCircle2 className="w-3 h-3 text-[#777777]" />
             <span>Prettier: OK</span>
           </div>
-          <div className="flex items-center gap-1 text-indigo-300">
-            <ShieldCheck className="w-3 h-3" />
+          <div className="flex items-center gap-1.5 text-[#A3A3A3]">
+            <ShieldCheck className="w-3 h-3 text-[#777777]" />
             <span>SAIF Safeguard: Active</span>
           </div>
         </div>

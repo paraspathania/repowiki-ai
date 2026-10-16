@@ -32,37 +32,41 @@ export function FileTree({ nodes, selectedPath, onSelect }: FileTreeProps) {
   const filteredNodes = filterNodes(nodes, filter);
 
   return (
-    <div className="w-full h-full flex flex-col bg-black border-r border-white/[0.08]">
+    <div className="w-full h-full flex flex-col bg-[#111111] border-r border-[#2A2A2A]">
       {/* Explorer Header Bar */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-white/[0.08] bg-black">
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[#2A2A2A] bg-[#111111]">
         <div className="flex items-center gap-2">
-          <FolderTree className="w-3.5 h-3.5 text-indigo-400" />
-          <span className="text-[10px] font-mono font-extrabold text-slate-400 uppercase tracking-wider">
+          <FolderTree className="w-3.5 h-3.5 text-[#A3A3A3]" />
+          <span className="text-[11px] font-mono font-medium text-[#F2F2F2] uppercase tracking-wider">
             Workspace Explorer
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <button className="p-1 rounded text-slate-500 hover:text-slate-300 hover:bg-white/[0.06] transition" title="Refresh Explorer">
+          <button
+            onClick={() => setFilter("")}
+            className="p-1 rounded text-[#777777] hover:text-[#F2F2F2] hover:bg-[#202020] transition"
+            title="Refresh Explorer"
+          >
             <RefreshCw className="w-3 h-3" />
           </button>
         </div>
       </div>
 
       {/* Dark IDE Search Bar */}
-      <div className="p-2.5 border-b border-white/[0.06] bg-black">
+      <div className="p-2.5 border-b border-[#2A2A2A] bg-[#111111]">
         <div className="relative flex items-center">
-          <Search className="w-3.5 h-3.5 absolute left-3 text-slate-500 pointer-events-none" />
+          <Search className="w-3.5 h-3.5 absolute left-3 text-[#777777] pointer-events-none" />
           <input
             type="text"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Quick open (⌘P)"
-            className="w-full pl-8 pr-3 py-1.5 bg-[#0a0a0a] border border-white/[0.1] focus:border-indigo-500/50 rounded-lg text-xs text-white placeholder:text-slate-600 font-mono focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition duration-150"
+            className="w-full pl-8 pr-7 py-1.5 bg-[#191919] border border-[#2A2A2A] focus:border-[#777777] rounded text-xs text-[#F2F2F2] placeholder:text-[#777777] font-mono focus:outline-none focus:ring-1 focus:ring-[#777777]/30 transition duration-150"
           />
           {filter && (
             <button
               onClick={() => setFilter("")}
-              className="absolute right-2.5 text-[10px] font-mono text-slate-500 hover:text-white"
+              className="absolute right-2.5 text-[10px] font-mono text-[#777777] hover:text-[#F2F2F2]"
             >
               ✕
             </button>
@@ -71,7 +75,7 @@ export function FileTree({ nodes, selectedPath, onSelect }: FileTreeProps) {
       </div>
 
       {/* File Tree List */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-0.5 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto p-2 space-y-0.5 custom-scrollbar bg-[#111111]">
         {filteredNodes.length > 0 ? (
           filteredNodes.map((node) => (
             <FileTreeNode
@@ -82,7 +86,7 @@ export function FileTree({ nodes, selectedPath, onSelect }: FileTreeProps) {
             />
           ))
         ) : (
-          <div className="p-4 text-center text-[11px] font-mono text-slate-600">
+          <div className="p-4 text-center text-[11px] font-mono text-[#777777]">
             No files found matching &quot;{filter}&quot;
           </div>
         )}

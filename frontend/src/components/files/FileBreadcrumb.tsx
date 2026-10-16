@@ -13,15 +13,15 @@ export function FileBreadcrumb({ path, onNavigate, onRunCode, isCompiling }: Fil
   const parts = path.split("/").filter(Boolean);
 
   return (
-    <div className="flex items-center justify-between px-4 py-2 bg-[#090c14] border-b border-white/[0.08] text-xs font-mono text-slate-400 select-none">
+    <div className="flex items-center justify-between px-3.5 py-2 bg-[#111111] border-b border-[#2A2A2A] text-xs font-mono text-[#A3A3A3] select-none">
       {/* Left: Breadcrumbs */}
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         <span
           onClick={() => onNavigate && onNavigate("/")}
-          className="hover:text-white cursor-pointer transition-colors duration-150 flex items-center gap-1 text-slate-400"
+          className="hover:text-[#F2F2F2] cursor-pointer transition-colors duration-150 flex items-center gap-1.5 text-[#A3A3A3]"
         >
-          <Folder className="w-3.5 h-3.5 text-amber-400" />
-          <span className="font-semibold text-slate-300">root</span>
+          <Folder className="w-3.5 h-3.5 text-[#777777]" />
+          <span className="font-medium text-[#A3A3A3]">root</span>
         </span>
 
         {parts.map((part, idx) => {
@@ -30,14 +30,14 @@ export function FileBreadcrumb({ path, onNavigate, onRunCode, isCompiling }: Fil
 
           return (
             <div key={currentPath} className="flex items-center gap-1.5 flex-shrink-0">
-              <ChevronRight className="w-3 h-3 text-slate-600 flex-shrink-0" />
+              <ChevronRight className="w-3 h-3 text-[#777777] flex-shrink-0" />
               <span
                 onClick={() => onNavigate && onNavigate(currentPath)}
-                className={`hover:text-white cursor-pointer transition-colors duration-150 flex items-center gap-1 ${
-                  isLast ? "text-white font-bold" : "text-slate-400"
+                className={`hover:text-[#F2F2F2] cursor-pointer transition-colors duration-150 flex items-center gap-1.5 ${
+                  isLast ? "text-[#F2F2F2] font-semibold" : "text-[#777777]"
                 }`}
               >
-                {isLast && <Code2 className="w-3.5 h-3.5 text-cyan-400" />}
+                {isLast && <Code2 className="w-3.5 h-3.5 text-[#A3A3A3]" />}
                 <span>{part}</span>
               </span>
             </div>
@@ -50,10 +50,10 @@ export function FileBreadcrumb({ path, onNavigate, onRunCode, isCompiling }: Fil
         <button
           onClick={onRunCode}
           disabled={isCompiling}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-mono font-bold text-xs shadow-md shadow-emerald-600/20 transition duration-150 active:scale-95 disabled:opacity-50"
+          className="flex items-center gap-1.5 px-3 py-1 rounded bg-[#F2F2F2] hover:bg-white text-[#111111] font-mono font-medium text-xs transition duration-150 disabled:opacity-40"
         >
           <Play className={`w-3 h-3 fill-current ${isCompiling ? "animate-spin" : ""}`} />
-          <span>{isCompiling ? "Compiling..." : "▶ Run Code"}</span>
+          <span>{isCompiling ? "Compiling..." : "Run Code"}</span>
         </button>
       </div>
     </div>

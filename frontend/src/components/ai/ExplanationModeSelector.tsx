@@ -9,15 +9,15 @@ export function ExplanationModeSelector({ mode, onChange }: ExplanationModeSelec
   const modes: ("beginner" | "intermediate" | "expert")[] = ["beginner", "intermediate", "expert"];
 
   return (
-    <div className="flex items-center gap-1 bg-surface/60 p-1 rounded-xl border border-white/[0.08] text-[10px]">
+    <div className="flex items-center bg-[#191919] p-0.5 rounded-sm border border-[#2A2A2A] text-[10px] font-mono">
       {modes.map((m) => (
         <button
           key={m}
           onClick={() => onChange(m)}
-          className={`px-3 py-1.5 rounded-lg capitalize font-bold transition duration-200 ${
+          className={`px-2 py-1 rounded-sm capitalize transition duration-150 ${
             mode === m 
-              ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/15" 
-              : "text-slate-400 hover:text-slate-200"
+              ? "bg-[#F2F2F2] text-[#111111] font-semibold" 
+              : "text-[#777777] hover:text-[#F2F2F2] bg-transparent"
           }`}
         >
           {m}
