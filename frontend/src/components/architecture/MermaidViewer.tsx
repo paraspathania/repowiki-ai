@@ -7,9 +7,10 @@ import { ZoomIn, ZoomOut, RotateCcw, Download, Copy, Check } from "lucide-react"
 interface MermaidViewerProps {
   chart: string;
   id?: string;
+  showControls?: boolean;
 }
 
-export function MermaidViewer({ chart, id = "mermaid-diagram" }: MermaidViewerProps) {
+export function MermaidViewer({ chart, id = "mermaid-diagram", showControls = true }: MermaidViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [svgContent, setSvgContent] = useState<string>("");
   const [zoom, setZoom] = useState<number>(1);
@@ -21,16 +22,21 @@ export function MermaidViewer({ chart, id = "mermaid-diagram" }: MermaidViewerPr
       startOnLoad: false,
       theme: "dark",
       securityLevel: "loose",
-      fontFamily: "Inter, sans-serif",
+      fontFamily: "var(--font-mono, monospace), monospace",
       themeVariables: {
         darkMode: true,
-        background: "#0d0f18",
-        primaryColor: "#4f46e5",
-        primaryTextColor: "#ffffff",
-        primaryBorderColor: "#6366f1",
-        lineColor: "#818cf8",
-        secondaryColor: "#059669",
-        tertiaryColor: "#9333ea",
+        background: "#141414",
+        primaryColor: "#1D1D1D",
+        primaryTextColor: "#F5F5F5",
+        primaryBorderColor: "#303030",
+        lineColor: "#737373",
+        secondaryColor: "#1D1D1D",
+        tertiaryColor: "#191919",
+        actorBkg: "#1D1D1D",
+        actorBorder: "#303030",
+        actorTextColor: "#F5F5F5",
+        signalColor: "#A3A3A3",
+        signalTextColor: "#F5F5F5",
       },
     });
 
@@ -76,66 +82,68 @@ export function MermaidViewer({ chart, id = "mermaid-diagram" }: MermaidViewerPr
   };
 
   return (
-    <div className="relative w-full h-full bg-[#080a10] rounded-2xl border border-white/[0.08] overflow-hidden flex flex-col">
+    <div className="relative w-full h-full bg-[#090909] rounded-lg border border-[#303030] overflow-hidden flex flex-col font-mono">
       {/* Controls Bar */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-white/[0.03] border-b border-white/[0.06] z-10">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-xs font-semibold text-slate-300">Mermaid Visualizer</span>
-        </div>
+      {showControls && (
+        <div className="flex items-center justify-between px-3.5 py-2 bg-[#141414] border-b border-[#303030] z-10 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#A3A3A3]" />
+            <span className="text-xs font-medium text-[#A3A3A3]">Mermaid AST Source</span>
+          </div>
 
-        <div className="flex items-center gap-1.5">
-          <button
-            onClick={() => setZoom((z) => Math.min(z + 0.2, 2.5))}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] transition duration-150"
-            title="Zoom In"
-          >
-            <ZoomIn className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setZoom((z) => Math.max(z - 0.2, 0.4))}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] transition duration-150"
-            title="Zoom Out"
-          >
-            <ZoomOut className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setZoom(1)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] transition duration-150"
-            title="Reset Zoom"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
-          <div className="w-px h-4 bg-white/[0.08] mx-1" />
-          <button
-            onClick={handleCopyMermaid}
-            className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 border border-white/[0.08] transition duration-150"
-          >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copied ? "Copied" : "Copy Code"}</span>
-          </button>
-          <button
-            onClick={handleDownloadSVG}
-            className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-500/30 transition duration-150 font-medium"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Export SVG</span>
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setZoom((z) => Math.min(z + 0.2, 2.5))}
+              className="p-1 rounded text-[#737373] hover:text-[#F5F5F5] hover:bg-[#1D1D1D] transition"
+              title="Zoom In"
+            >
+              <ZoomIn className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setZoom((z) => Math.max(z - 0.2, 0.4))}
+              className="p-1 rounded text-[#737373] hover:text-[#F5F5F5] hover:bg-[#1D1D1D] transition"
+              title="Zoom Out"
+            >
+              <ZoomOut className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setZoom(1)}
+              className="p-1 rounded text-[#737373] hover:text-[#F5F5F5] hover:bg-[#1D1D1D] transition"
+              title="Reset Zoom"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+            <div className="w-px h-3.5 bg-[#303030] mx-1" />
+            <button
+              onClick={handleCopyMermaid}
+              className="flex items-center gap-1 px-2.5 py-1 text-xs rounded bg-[#1D1D1D] hover:bg-[#262626] text-[#A3A3A3] hover:text-[#F5F5F5] border border-[#303030] transition"
+            >
+              {copied ? <Check className="w-3 h-3 text-[#F5F5F5]" /> : <Copy className="w-3 h-3" />}
+              <span>{copied ? "Copied" : "Copy Code"}</span>
+            </button>
+            <button
+              onClick={handleDownloadSVG}
+              className="flex items-center gap-1 px-2.5 py-1 text-xs rounded bg-[#F5F5F5] hover:bg-white text-[#111111] transition font-medium"
+            >
+              <Download className="w-3 h-3" />
+              <span>Export SVG</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Canvas Viewport */}
-      <div className="flex-1 overflow-auto p-8 flex items-center justify-center relative no-scrollbar">
+      <div className="flex-1 overflow-auto p-6 flex items-center justify-center relative no-scrollbar">
         {error ? (
-          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-mono max-w-lg">
+          <div className="p-4 rounded border border-[#303030] bg-[#141414] text-[#A3A3A3] text-xs font-mono max-w-lg">
             Failed to parse Mermaid diagram code syntax:
-            <pre className="mt-2 text-[11px] whitespace-pre-wrap">{error}</pre>
+            <pre className="mt-2 text-[11px] whitespace-pre-wrap text-[#737373]">{error}</pre>
           </div>
         ) : (
           <div
             ref={containerRef}
             style={{ transform: `scale(${zoom})`, transformOrigin: "center center" }}
-            className="transition-transform duration-200 ease-out max-w-full"
+            className="transition-transform duration-150 ease-out max-w-full"
             dangerouslySetInnerHTML={{ __html: svgContent }}
           />
         )}
