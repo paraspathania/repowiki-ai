@@ -1,8 +1,11 @@
 "use client";
 
-import { CheckCircle2, Circle, Loader2, AlertTriangle, ArrowRight } from "lucide-react";
-import { ProgressEvent } from "@/hooks/useAnalysisEvents";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Check, Loader2, ArrowRight, AlertTriangle, RefreshCw } from "lucide-react";
+import { ProgressEvent } from "@/hooks/useAnalysisEvents";
+import { repoService } from "@/lib/api/client";
+import { Repository } from "@/types";
 
 interface AnalysisProgressProps {
   event: ProgressEvent;
@@ -10,114 +13,255 @@ interface AnalysisProgressProps {
   repoId?: string;
 }
 
-const STAGES = [
-  { id: "connecting", label: "Connecting to GitHub", weight: 5 },
-  { id: "metadata", label: "Fetching metadata", weight: 10 },
-  { id: "cloning", label: "Cloning repository", weight: 20 },
-  { id: "scanning", label: "Scanning files", weight: 25 },
-  { id: "file_tree", label: "Building file tree", weight: 30 },
-  { id: "languages", label: "Detecting languages", weight: 35 },
-  { id: "frameworks", label: "Detecting frameworks", weight: 40 },
-  { id: "parsing", label: "Parsing source code", weight: 50 },
-  { id: "apis", label: "Detecting APIs", weight: 55 },
-  { id: "database", label: "Detecting database models", weight: 60 },
-  { id: "dependencies", label: "Building dependency graph", weight: 65 },
-  { id: "chunking", label: "Chunking repository", weight: 75 },
-  { id: "embeddings", label: "Generating embeddings", weight: 85 },
-  { id: "summary", label: "Generating project summary", weight: 90 },
-  { id: "wiki", label: "Generating Wiki", weight: 95 },
-  { id: "architecture", label: "Generating architecture", weight: 98 },
-  { id: "finalizing", label: "Finalizing workspace", weight: 100 },
+interface TimelineStage {
+  id: string;
+  title: string;
+  description: string;
+  threshold: number;
+}
+
+const PIPELINE_STAGES: TimelineStage[] = [
+  {
+    id: "STAGE_01 // INGESTION",
+    title: "Repository connection & file tree",
+    description: "Cloned source archive and indexed file tree hierarchy.",
+    threshold: 25,
+  },
+  {
+    id: "STAGE_02 // AST_PARSER",
+    title: "Syntax tree & symbol analysis",
+    description: "Parsed AST symbols, function signatures, and route decorators.",
+    threshold: 50,
+  },
+  {
+    id: "STAGE_03 // DEPENDENCIES",
+    title: "Dependency & manifest resolution",
+    description: "Resolved requirements, lockfiles, and cross-package links.",
+    threshold: 70,
+  },
+  {
+    id: "STAGE_04 // EMBEDDINGS",
+    title: "Semantic chunking & vector indexing",
+    description: "Generated vector embeddings and stored symbol chunks.",
+    threshold: 88,
+  },
+  {
+    id: "STAGE_05 // SYNTHESIS",
+    title: "Technical documentation & topology",
+    description: "Compiled 5-chapter wiki and Mermaid architecture graphs.",
+    threshold: 100,
+  },
 ];
 
 export function AnalysisProgressCard({ event, analysisId, repoId }: AnalysisProgressProps) {
-  const currentProgress = event.progress || 10;
+  const currentProgress = event.progress ?? (event.status === "completed" ? 100 : 15);
   const isCompleted = currentProgress >= 100 || event.status === "completed";
   const isFailed = event.status === "failed";
+  const targetRepoId = event.repository_id || repoId || "repo-123";
 
-  const targetRepoId = event.repository_id || repoId;
+  const [repo, setRepo] = useState<Repository | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (targetRepoId) {
+      repoService
+        .getRepository(targetRepoId)
+        .then((data) => {
+          if (isMounted && data) {
+            setRepo(data);
+          }
+        })
+        .catch(() => {
+          // Non-critical fallback
+        });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [targetRepoId]);
+
+  const targetUrl = targetRepoId
+    ? `/repositories/${targetRepoId}/overview`
+    : `/dashboard`;
 
   return (
-    <div className="w-full max-w-2xl mx-auto glass-panel rounded-2xl p-8 space-y-8 shadow-2xl relative overflow-hidden animate-fade-in">
-      <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 animate-pulse" />
+    <div className="w-full max-w-2xl bg-[#171717] border border-[#292929] rounded-sm p-6 sm:p-8 space-y-7 shadow-2xl">
       
-      <div className="space-y-3 text-center">
-        <h2 className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-200 tracking-tight">
-          {isCompleted ? "Analysis Complete!" : isFailed ? "Analysis Failed" : "Analyzing Repository"}
-        </h2>
-        <p className="text-slate-400 text-sm leading-relaxed max-w-md mx-auto">{event.message || "Building structured repository understanding..."}</p>
+      {/* 1. Compact Left-Aligned Status Header */}
+      <div className="space-y-1.5 text-left">
+        <div className="font-mono text-[11px] text-[#777777] tracking-wider uppercase flex items-center gap-2">
+          <span className="w-1.5 h-1.5 bg-[#F5F5F5] rounded-none" />
+          <span>PIPELINE CONSOLE // {isCompleted ? "COMPLETE" : isFailed ? "FAILED" : "PROCESSING"}</span>
+        </div>
+
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#F5F5F5] font-sans">
+          {isCompleted
+            ? "Repository analyzed."
+            : isFailed
+            ? "Analysis failed."
+            : "Analyzing repository."}
+        </h1>
+
+        <p className="text-sm text-[#BDBDBD] font-sans leading-relaxed">
+          {isCompleted
+            ? "Your codebase is ready to explore."
+            : isFailed
+            ? (event.failure_reason || "Process encountered an unrecoverable pipeline error.")
+            : (event.message || "Building structured repository understanding...")}
+        </p>
       </div>
 
-      {/* Progress Bar */}
-      <div className="space-y-3">
-        <div className="flex justify-between text-xs font-bold text-slate-400">
-          <span className="uppercase tracking-wider">Progress</span>
-          <span className="font-mono text-indigo-400">{currentProgress}%</span>
+      {/* 2. Compact Horizontal Metadata & Real Metrics Summary */}
+      <div className="bg-[#1D1D1D] border border-[#292929] rounded-sm p-3.5 flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-xs font-mono">
+        <div className="flex items-center gap-2">
+          <span className="text-[#777777]">STATUS:</span>
+          <span className="text-[#F5F5F5] font-semibold">
+            {isCompleted ? "ANALYZED" : isFailed ? "ERROR" : "RUNNING"}
+          </span>
         </div>
-        <div className="w-full h-3 bg-surface/50 border border-white/[0.06] rounded-full overflow-hidden p-[2px]">
+
+        <div className="flex items-center gap-2">
+          <span className="text-[#777777]">ID:</span>
+          <span className="text-[#BDBDBD] truncate max-w-[120px] sm:max-w-[160px]" title={analysisId}>
+            {analysisId ? (analysisId.length > 12 ? `${analysisId.slice(0, 12)}…` : analysisId) : "active"}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-[#777777]">REPO:</span>
+          <span className="text-[#F5F5F5] truncate max-w-[140px] sm:max-w-[200px]">
+            {repo?.full_name || repo?.name || (targetRepoId ? `repo-${targetRepoId.slice(0, 6)}` : "repowiki-ai")}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-[#777777]">BRANCH:</span>
+          <span className="text-[#BDBDBD]">{repo?.default_branch || "main"}</span>
+        </div>
+      </div>
+
+      {/* 3. Thin Neutral-Gray Progress Line & Percentage Label */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs font-mono">
+          <span className="text-[#777777] uppercase text-[11px] tracking-wider">
+            {isCompleted ? "Pipeline Complete" : isFailed ? "Halted" : "Analyzing Codebase"}
+          </span>
+          <span className="text-[#F5F5F5] font-medium">{currentProgress}%</span>
+        </div>
+
+        <div className="w-full h-1 bg-[#292929] rounded-none overflow-hidden">
           <div
-            className={`h-full transition-all duration-500 rounded-full bg-gradient-to-r ${
-              isFailed 
-                ? "from-red-500 to-rose-600" 
-                : isCompleted 
-                  ? "from-emerald-500 to-teal-500" 
-                  : "from-blue-500 via-indigo-500 to-purple-500"
+            className={`h-full transition-all duration-300 ${
+              isFailed ? "bg-red-400" : "bg-[#F5F5F5]"
             }`}
             style={{ width: `${currentProgress}%` }}
           />
         </div>
       </div>
 
-      {/* Stages Timeline */}
-      <div className="space-y-3.5 max-h-80 overflow-y-auto pr-2 custom-scrollbar border border-white/[0.04] bg-surface/20 rounded-xl p-4">
-        {STAGES.map((s) => {
-          const isDone = currentProgress > s.weight || isCompleted;
-          const isCurrent = currentProgress <= s.weight && currentProgress > (s.weight - 10) && !isCompleted && !isFailed;
+      {/* 4. Compact Pipeline Timeline (No Clipped Rows, Consistent Spacing) */}
+      <div className="space-y-2">
+        <div className="text-[11px] font-mono text-[#777777] uppercase tracking-wider">
+          Execution Stages
+        </div>
 
-          return (
-            <div key={s.id} className="flex items-center gap-3.5 text-sm transition-all duration-300">
-              {isDone ? (
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-              ) : isCurrent ? (
-                <Loader2 className="w-5 h-5 text-indigo-400 animate-spin flex-shrink-0" />
-              ) : (
-                <Circle className="w-5 h-5 text-slate-700 flex-shrink-0" />
-              )}
-              <span className={isDone ? "text-slate-200" : isCurrent ? "text-indigo-300 font-semibold" : "text-slate-500"}>
-                {s.label}
-              </span>
-            </div>
-          );
-        })}
+        <div className="border border-[#292929] bg-[#171717] rounded-sm divide-y divide-[#292929]">
+          {PIPELINE_STAGES.map((stage) => {
+            const isStageDone = isCompleted || currentProgress >= stage.threshold;
+            const isStageCurrent =
+              !isCompleted &&
+              !isFailed &&
+              currentProgress < stage.threshold &&
+              currentProgress >= stage.threshold - 25;
+
+            return (
+              <div
+                key={stage.id}
+                className="px-4 py-3 flex items-center justify-between gap-3 text-xs transition-colors hover:bg-[#1D1D1D]/50"
+              >
+                {/* Left: Indicator + Labels */}
+                <div className="flex items-start gap-3 min-w-0">
+                  <div className="w-5 h-5 rounded-none border border-[#292929] bg-[#1D1D1D] flex items-center justify-center shrink-0 mt-0.5">
+                    {isStageDone ? (
+                      <Check className="w-3.5 h-3.5 text-[#F5F5F5]" />
+                    ) : isStageCurrent ? (
+                      <Loader2 className="w-3 h-3 text-[#BDBDBD] animate-spin" />
+                    ) : (
+                      <span className="w-1.5 h-1.5 bg-[#777777] rounded-none" />
+                    )}
+                  </div>
+
+                  <div className="min-w-0">
+                    <span className="font-mono text-[10px] text-[#777777] block tracking-tight">
+                      {stage.id}
+                    </span>
+                    <span className="font-sans font-medium text-xs text-[#F5F5F5] block truncate">
+                      {stage.title}
+                    </span>
+                    <span className="font-sans text-[11px] text-[#BDBDBD] block truncate">
+                      {stage.description}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Right: Stage Status Tag */}
+                <div className="shrink-0 font-mono text-[11px] text-right">
+                  {isStageDone ? (
+                    <span className="text-[#F5F5F5] font-semibold">DONE</span>
+                  ) : isStageCurrent ? (
+                    <span className="text-[#BDBDBD]">IN PROGRESS</span>
+                  ) : (
+                    <span className="text-[#777777]">QUEUED</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Action Footer */}
+      {/* 5. Refined Actions Footer */}
       {isCompleted && (
-        <div className="pt-4 border-t border-white/[0.06]">
+        <div className="pt-2 border-t border-[#292929] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="font-mono text-[11px] text-[#777777]">
+            Documentation synthesized • Ready for navigation
+          </div>
+
           <Link
-            href={targetRepoId ? `/repositories/${targetRepoId}/overview` : `/dashboard`}
-            className="w-full py-4 bg-white hover:bg-neutral-200 text-neutral-950 font-semibold rounded-xl flex items-center justify-center gap-2.5 transition-all duration-200 shadow-sm hover:shadow active:scale-[0.99]"
+            href={targetUrl}
+            className="w-full sm:w-auto px-5 py-2.5 bg-[#F5F5F5] hover:bg-[#E0E0E0] text-[#0C0C0C] font-semibold text-xs tracking-tight rounded-sm transition-colors duration-150 inline-flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#F5F5F5] active:scale-[0.99]"
           >
-            <span>Open Repository Workspace</span>
-            <ArrowRight className="w-5 h-5 text-neutral-950" />
+            <span>Explore repository →</span>
           </Link>
         </div>
       )}
 
       {isFailed && (
-        <div className="pt-6 border-t border-white/[0.06] flex flex-col md:flex-row md:items-center justify-between gap-4 text-rose-300 text-sm">
-          <div className="flex items-center gap-2.5">
-            <AlertTriangle className="w-5 h-5 text-rose-400 flex-shrink-0" />
-            <span>{event.failure_reason ? `Analysis failed: ${event.failure_reason}` : "Analysis process encountered an error."}</span>
+        <div className="pt-4 border-t border-[#292929] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-xs text-[#F5F5F5]">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <span className="text-[#BDBDBD]">
+              {event.failure_reason || "Analysis failed. Please check repository permissions or network connectivity."}
+            </span>
           </div>
+
           <button
             onClick={() => window.location.reload()}
-            className="px-5 py-2.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-white text-xs font-bold hover:bg-rose-500/20 transition duration-200"
+            className="px-4 py-2 border border-[#292929] hover:bg-[#1D1D1D] text-[#F5F5F5] text-xs font-mono rounded-sm transition-colors flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#F5F5F5]"
           >
-            Retry
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Retry analysis</span>
           </button>
         </div>
       )}
+
+      {!isCompleted && !isFailed && (
+        <div className="pt-2 border-t border-[#292929] flex items-center justify-between text-xs font-mono text-[#777777]">
+          <span>Processing AST syntax grammars...</span>
+          <span>Elapsed: ~12s</span>
+        </div>
+      )}
+
     </div>
   );
 }

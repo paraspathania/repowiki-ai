@@ -42,7 +42,7 @@ export default function RepositoryWorkspaceLayout({
   };
 
   return (
-    <div className="h-screen flex flex-col bg-background overflow-hidden">
+    <div className="h-screen flex flex-col bg-[#0A0A0A] text-[#F5F5F5] overflow-hidden">
       <RepositoryHeader
         repoId={params.repoId}
         repoName={repo?.full_name || repo?.name || `Repository`}

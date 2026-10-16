@@ -74,18 +74,20 @@ export function RepositoryHeader({
       : "https://github.com";
 
   return (
-    <header className="h-14 bg-black border-b border-white/[0.08] px-4 md:px-6 flex items-center justify-between text-xs sticky top-0 z-40 select-none">
-      {/* Left section */}
+    <header className="h-12 bg-[#0A0A0A] border-b border-[#303030] px-4 md:px-6 flex items-center justify-between text-xs sticky top-0 z-40 select-none">
+      {/* Left section: Identity, Branch, Meta */}
       <div className="flex items-center gap-3">
         <Link
           href="/"
-          className="flex items-center gap-1.5 font-bold text-white text-sm hover:text-indigo-400 transition duration-200 tracking-tight"
+          className="flex items-center gap-2 font-bold text-[#F5F5F5] text-xs hover:text-[#A3A3A3] transition-colors tracking-tight uppercase font-mono"
         >
-          <Sparkles className="w-4 h-4 text-indigo-400" />
+          <span className="w-2 h-2 bg-[#F5F5F5] inline-block rounded-none" />
           <span>RepoWiki AI</span>
         </Link>
-        <span className="text-slate-700">/</span>
-        <span className="text-slate-200 font-semibold text-xs tracking-tight truncate max-w-[200px]" title={repoName}>
+
+        <span className="text-[#303030]">/</span>
+
+        <span className="text-[#F5F5F5] font-medium text-xs tracking-tight truncate max-w-[200px] font-mono" title={repoName}>
           {repoName}
         </span>
 
@@ -93,29 +95,29 @@ export function RepositoryHeader({
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsBranchDropdownOpen(!isBranchDropdownOpen)}
-            className="flex items-center gap-1.5 px-2.5 py-1 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] rounded-lg text-slate-300 transition duration-150 active:scale-95"
+            className="flex items-center gap-1.5 px-2 py-1 bg-[#141414] hover:bg-[#1D1D1D] border border-[#303030] rounded-sm text-[#A3A3A3] hover:text-[#F5F5F5] transition duration-150 active:scale-95 text-xs font-mono"
             title="Switch git branch"
           >
-            <GitBranch className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
-            <span className="font-mono text-[11px] font-medium max-w-[100px] truncate">{selectedBranch}</span>
+            <GitBranch className="w-3 h-3 text-[#737373] flex-shrink-0" />
+            <span className="text-[11px] font-medium max-w-[100px] truncate">{selectedBranch}</span>
           </button>
 
           {isBranchDropdownOpen && (
-            <div className="absolute top-full left-0 mt-1 w-56 bg-[#141722] border border-white/[0.12] rounded-xl shadow-2xl z-50 py-1.5 animate-fade-in">
-              <div className="px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider text-slate-400 border-b border-white/[0.06] flex items-center justify-between">
-                <span>Repository Branches</span>
-                <span className="text-[9px] font-mono text-slate-500">
+            <div className="absolute top-full left-0 mt-1.5 w-56 bg-[#141414] border border-[#303030] rounded-sm shadow-xl z-50 py-1 font-mono">
+              <div className="px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider text-[#737373] border-b border-[#303030] flex items-center justify-between">
+                <span>Branches</span>
+                <span className="text-[9px] text-[#737373]">
                   {isLoadingBranches ? "loading..." : `${branches.length} total`}
                 </span>
               </div>
 
               {isLoadingBranches ? (
-                <div className="p-3 flex items-center justify-center gap-2 text-slate-500 text-xs font-mono">
+                <div className="p-3 flex items-center justify-center gap-2 text-[#737373] text-xs">
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>Fetching branches...</span>
+                  <span>Fetching...</span>
                 </div>
               ) : (
-                <div className="max-h-56 overflow-y-auto custom-scrollbar py-1">
+                <div className="max-h-56 overflow-y-auto custom-scrollbar py-1 divide-y divide-[#303030]/40">
                   {branches.map((b) => (
                     <button
                       key={b}
@@ -124,12 +126,12 @@ export function RepositoryHeader({
                         setIsBranchDropdownOpen(false);
                         onBranchChange?.(b);
                       }}
-                      className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-white/[0.06] transition-colors ${
-                        selectedBranch === b ? "text-indigo-400 font-bold bg-indigo-600/10" : "text-slate-300"
+                      className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-[#1D1D1D] transition-colors ${
+                        selectedBranch === b ? "text-[#F5F5F5] font-semibold bg-[#1D1D1D]" : "text-[#A3A3A3]"
                       }`}
                     >
-                      <span className="font-mono truncate">{b}</span>
-                      {selectedBranch === b && <Check className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />}
+                      <span className="truncate">{b}</span>
+                      {selectedBranch === b && <Check className="w-3 h-3 text-[#F5F5F5] flex-shrink-0" />}
                     </button>
                   ))}
                 </div>
@@ -138,46 +140,47 @@ export function RepositoryHeader({
           )}
         </div>
 
-        {/* Live Repo metadata badges */}
-        <div className="hidden md:flex items-center gap-2 text-[11px] text-slate-400">
-          <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="GitHub Stars">
-            <Star className="w-3 h-3 text-amber-400 fill-amber-400/20" />
-            {stars.toLocaleString()}
+        {/* Live Repo metadata badges - only on desktop to prevent collision on tablet */}
+        <div className="hidden lg:flex items-center gap-1.5 text-[11px] font-mono text-[#737373]">
+          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-[#141414] border border-[#303030]" title="GitHub Stars">
+            <Star className="w-3 h-3 text-[#737373]" />
+            <span className="text-[#A3A3A3]">{stars.toLocaleString()}</span>
           </span>
-          <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="GitHub Forks">
-            <GitFork className="w-3 h-3 text-slate-400" />
-            {forks.toLocaleString()}
+          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-[#141414] border border-[#303030]" title="GitHub Forks">
+            <GitFork className="w-3 h-3 text-[#737373]" />
+            <span className="text-[#A3A3A3]">{forks.toLocaleString()}</span>
           </span>
         </div>
       </div>
 
-      {/* Right section */}
-      <div className="flex items-center gap-3">
+      {/* Right section: Search, GitHub, UserMenu */}
+      <div className="flex items-center gap-2">
         {/* Semantic search launcher button */}
         <button
           onClick={onOpenSearch}
-          className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] rounded-xl text-slate-400 hover:text-slate-200 transition duration-150 text-xs"
+          className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 bg-[#141414] hover:bg-[#1D1D1D] border border-[#303030] rounded-sm text-[#737373] hover:text-[#A3A3A3] transition text-xs font-mono"
+          title="Search Code / AI"
         >
-          <Search className="w-3.5 h-3.5 text-indigo-400" />
-          <span className="hidden sm:inline">Search Code / AI Semantic...</span>
-          <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-white/[0.08] rounded text-slate-400 border border-white/[0.1]">
+          <Search className="w-3.5 h-3.5 text-[#737373]" />
+          <span className="hidden md:inline text-[#A3A3A3]">Search...</span>
+          <kbd className="hidden md:inline-block px-1 py-0.2 text-[9px] font-mono bg-[#1D1D1D] rounded-none text-[#737373] border border-[#303030]">
             ⌘K
           </kbd>
         </button>
 
-        {/* GitHub link button — accurately points to this repository */}
+        {/* GitHub link button */}
         <a
           href={actualGithubUrl}
           target="_blank"
           rel="noreferrer"
-          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 rounded-xl transition duration-200 font-medium text-xs active:scale-95"
+          className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-[#141414] hover:bg-[#1D1D1D] text-[#A3A3A3] hover:text-[#F5F5F5] border border-[#303030] rounded-sm transition font-mono text-xs"
           title={`Open ${actualGithubUrl} on GitHub`}
         >
           <span>GitHub</span>
-          <ExternalLink className="w-3 h-3" />
+          <ExternalLink className="w-3 h-3 text-[#737373]" />
         </a>
 
-        <div className="w-px h-5 bg-white/[0.08]" />
+        <div className="w-px h-4 bg-[#303030] hidden sm:block" />
         <UserMenu />
       </div>
     </header>

@@ -1,832 +1,528 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import {
-  Code,
-  FileText,
-  GitFork,
-  MessageSquare,
-  Play,
-  Pause,
-  RotateCcw,
-  Sparkles,
-  CheckCircle2,
-  Cpu,
-  Layers,
+  FileCode,
+  Folder,
+  FolderOpen,
   Terminal,
-  ExternalLink,
-  ChevronRight,
-  ShieldCheck,
-  Zap,
-  Database,
+  GitBranch,
+  CheckCircle2,
   Lock,
-  Search,
+  ExternalLink,
   Copy,
   Check,
-  BookOpen,
+  Cpu,
+  Layers,
+  Sparkles,
+  ArrowRight,
+  Database,
   Server,
-  Radio,
-  FileCode,
-  ListFilter,
-  CheckSquare,
+  ShieldCheck,
+  MessageSquare,
+  FileText,
 } from "lucide-react";
 
-type Mode = "code" | "wiki" | "architecture" | "chat" | "apis" | "security";
-
-interface ModeConfig {
-  id: Mode;
-  label: string;
-  badge: string;
-  icon: React.ComponentType<{ className?: string }>;
-  fileName: string;
+interface FileEntry {
+  path: string;
+  name: string;
   language: string;
-  description: string;
+  code: string;
+  explanation: {
+    title: string;
+    description: string;
+    citations: string;
+    references: string;
+  };
 }
 
-const MODES: ModeConfig[] = [
-  {
-    id: "code",
-    label: "Code Walkthrough",
-    badge: "Syntax & AST",
-    icon: Code,
-    fileName: "auth-context.tsx",
-    language: "TypeScript",
-    description: "Deep code analysis with line-by-line AST symbols and grounded logic.",
-  },
-  {
-    id: "wiki",
-    label: "Technical Wiki",
-    badge: "14 Multi-Pages",
-    icon: FileText,
-    fileName: "1_PROJECT_OVERVIEW.md",
-    language: "Markdown",
-    description: "Automated structured technical documentation generated from source code.",
-  },
-  {
-    id: "architecture",
-    label: "Architecture Visualizer",
-    badge: "Interactive Flow",
-    icon: GitFork,
-    fileName: "system_architecture.mmd",
-    language: "Mermaid Graph",
-    description: "Evidence-grounded module relationship trees & visual dependency graphs.",
-  },
-  {
-    id: "chat",
-    label: "Grounded AI Chat",
-    badge: "Zero Hallucination",
-    icon: MessageSquare,
-    fileName: "AI_ASSISTANT.stream",
-    language: "RepoAI Engine",
-    description: "Conversational code intelligence with line-level verified citations.",
-  },
-  {
-    id: "apis",
-    label: "APIs & Schema",
-    badge: "OpenAPI & ERD",
-    icon: Database,
-    fileName: "openapi_schema.json",
-    language: "JSON / SQL",
-    description: "Extracted REST routes, request signatures, and relational ERD tables.",
-  },
-  {
-    id: "security",
-    label: "Security & SAIF",
-    badge: "Compliance Audit",
-    icon: ShieldCheck,
-    fileName: "SAIF_SECURITY.report",
-    language: "Security Scan",
-    description: "Automated secret masking, vulnerability detection, and SAIF risk scoring.",
-  },
-];
+const REPO_FILES: Record<string, FileEntry> = {
+  "ast_analyzer.py": {
+    path: "backend/app/services/ast_analyzer.py",
+    name: "ast_analyzer.py",
+    language: "python",
+    code: `class CodebaseASTAnalyzer:
+    """Tree-Sitter syntax analyzer for AST symbols & REST routes."""
+    def __init__(self, repo_path: str):
+        self.parser = get_tree_sitter_parser("python")
+        self.symbols = SymbolTable()
 
-export function Hero3DShowcase() {
-  const [activeMode, setActiveMode] = useState<Mode>("code");
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
-  const [progress, setProgress] = useState<number>(0);
-  const [isHovered, setIsHovered] = useState<boolean>(false);
+    def extract_route_handlers(self) -> List[RouteDefinition]:
+        # Inspects AST decorator nodes for @router.get / @router.post
+        visitor = FastAPIRouteVisitor()
+        visitor.visit(self.tree.root_node)
+        return visitor.collected_routes`,
+    explanation: {
+      title: "Tree-Sitter AST Route Extraction",
+      description:
+        "Statically parses Python AST decorator syntax to extract REST endpoints, parameter schemas, and HTTP methods without runtime execution.",
+      citations: "Lines 12–28 in ast_analyzer.py",
+      references: "3 Handlers Detected • 100% AST Verified",
+    },
+  },
+  "auth-context.tsx": {
+    path: "frontend/src/lib/auth-context.tsx",
+    name: "auth-context.tsx",
+    language: "typescript",
+    code: `export interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  signInWithGitHub: () => Promise<void>;
+  signOut: () => void;
+}
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  // Hydrates JWT from localStorage and attaches Bearer header
+  return <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>;
+}`,
+    explanation: {
+      title: "Client-Side JWT & Session Context",
+      description:
+        "Manages client authentication state using React Context. Hydrates session tokens and integrates with Axios interceptors.",
+      citations: "Lines 14–38 in auth-context.tsx",
+      references: "Exported AuthProvider • 4 Consuming Modules",
+    },
+  },
+  "client.py": {
+    path: "backend/app/providers/github/client.py",
+    name: "client.py",
+    language: "python",
+    code: `class GitHubClient:
+    """Async client for repository trees, commits & archive streaming."""
+    async def fetch_repository_tree(self, repo_id: str, branch: str = "main"):
+        endpoint = f"/repos/{repo_id}/git/trees/{branch}?recursive=1"
+        response = await self.http.get(endpoint)
+        return self._filter_ignored_paths(response.json())`,
+    explanation: {
+      title: "GitHub Tree Streaming & Ignore Rules",
+      description:
+        "Recursively fetches Git file trees while filtering binary files, vendor directories, and .gitignore patterns.",
+      citations: "Lines 34–52 in client.py",
+      references: "Provider Service • Rate-limit Cached",
+    },
+  },
+};
+
+/**
+ * Compact, convincing repository exploration interface for Hero (Right column)
+ */
+export function HeroRepositoryExplorer() {
+  const [selectedKey, setSelectedKey] = useState<string>("ast_analyzer.py");
   const [copied, setCopied] = useState<boolean>(false);
-  
-  const containerRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
 
-  // Sub-tab selection state inside showcase tabs
-  const [selectedFile, setSelectedFile] = useState<string>("auth-context.tsx");
-  const [selectedWikiPage, setSelectedWikiPage] = useState<string>("overview");
-  const [selectedApiRoute, setSelectedApiRoute] = useState<string>("GET /api/v1/repos/{id}/wiki");
+  const activeFile = REPO_FILES[selectedKey] || REPO_FILES["ast_analyzer.py"];
 
-  const physicsRef = useRef({ rotX: 0, rotY: 0, scale: 1, opacity: 1 });
-
-  // Smooth 60fps RAF scroll physics loop (zero snapping when cursor leaves box)
-  useEffect(() => {
-    let animationFrameId: number;
-
-    const updatePhysics = () => {
-      if (containerRef.current && cardRef.current) {
-        let targetRotX = 0;
-        let targetRotY = 0;
-        let targetScale = 1;
-        let targetOpacity = 1;
-
-        if (!isHovered) {
-          const rect = containerRef.current.getBoundingClientRect();
-          const windowHeight = window.innerHeight;
-          
-          const elementTop = rect.top;
-          const startTrigger = windowHeight;
-          const targetTrigger = windowHeight * 0.2;
-
-          const rawRatio = (startTrigger - elementTop) / (startTrigger - targetTrigger);
-          const clampedRatio = Math.min(Math.max(rawRatio, 0), 1);
-
-          targetRotX = 18 * (1 - clampedRatio);
-          targetRotY = -2 * (1 - clampedRatio);
-          targetScale = 0.92 + 0.08 * clampedRatio;
-          targetOpacity = 0.6 + 0.4 * clampedRatio;
-        }
-
-        // LERP interpolation continuously using physicsRef to prevent any snap/shake on hover exit
-        const physics = physicsRef.current;
-        const lerpFactor = 0.08;
-        physics.rotX += (targetRotX - physics.rotX) * lerpFactor;
-        physics.rotY += (targetRotY - physics.rotY) * lerpFactor;
-        physics.scale += (targetScale - physics.scale) * lerpFactor;
-        physics.opacity += (targetOpacity - physics.opacity) * lerpFactor;
-
-        cardRef.current.style.transform = `perspective(1200px) rotateX(${physics.rotX.toFixed(2)}deg) rotateY(${physics.rotY.toFixed(2)}deg) scale3d(${physics.scale.toFixed(3)}, ${physics.scale.toFixed(3)}, 1) translateZ(0)`;
-        containerRef.current.style.opacity = physics.opacity.toFixed(2);
-      }
-
-      animationFrameId = requestAnimationFrame(updatePhysics);
-    };
-
-    animationFrameId = requestAnimationFrame(updatePhysics);
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [isHovered]);
-
-  // Auto-play timer loop
-  useEffect(() => {
-    if (!isPlaying) return;
-
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          setActiveMode((current) => {
-            const currentIndex = MODES.findIndex((m) => m.id === current);
-            const nextIndex = (currentIndex + 1) % MODES.length;
-            return MODES[nextIndex].id;
-          });
-          return 0;
-        }
-        return prev + 1.1; // ~9 seconds per tab cycle
-      });
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, [isPlaying]);
-
-  const handleModeSelect = (mode: Mode) => {
-    setActiveMode(mode);
-    setProgress(0);
-  };
-
-  // Direct ref DOM update for glow tracking — zero React re-renders, zero shaking
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!glowRef.current || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const glowX = ((e.clientX - rect.left) / rect.width) * 100;
-    const glowY = ((e.clientY - rect.top) / rect.height) * 100;
-    
-    glowRef.current.style.background = `radial-gradient(circle at ${glowX.toFixed(1)}% ${glowY.toFixed(1)}%, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.08), transparent 70%)`;
-  };
-
-  const handleMouseEnter = () => setIsHovered(true);
-  const handleMouseLeave = () => setIsHovered(false);
-
-  const handleCopyCode = (text: string) => {
+  const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6">
-      {/* 3D Perspective Wrapper */}
-      <div
-        ref={containerRef}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        className="perspective-container relative group cursor-pointer opacity-50"
-        style={{ willChange: "opacity" }}
-      >
-        {/* Ambient Glow */}
-        <div
-          ref={glowRef}
-          className="absolute -inset-4 rounded-3xl opacity-50 transition-opacity duration-500 blur-3xl pointer-events-none animate-pulse-glow"
-          style={{
-            background: `radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.08), transparent 70%)`,
-          }}
-        />
+    <div className="w-full bg-[#191A18] border border-[rgba(232,232,223,0.12)] rounded-md overflow-hidden shadow-2xl">
+      {/* Explorer Titlebar */}
+      <div className="flex items-center justify-between px-3.5 py-2.5 bg-[#141514] border-b border-[rgba(232,232,223,0.08)] text-xs font-mono">
+        <div className="flex items-center gap-2 text-[#A1A39B] truncate">
+          <span className="text-[#C5F467] font-semibold">repo:</span>
+          <span className="text-[#E8E8DF] font-medium truncate">paraspathania/repowiki-ai</span>
+          <span className="text-[11px] px-1.5 py-0.2 bg-[#101110] border border-[rgba(232,232,223,0.08)] text-[#A1A39B]">
+            main
+          </span>
+        </div>
 
-        {/* Outer Showcase Window (GitHub #0d1117 Dark Obsidian Shell with RAF LERP physics) */}
-        <div
-          ref={cardRef}
-          className="hero-3d-card relative rounded-2xl border border-[#30363d] bg-[#0d1117] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.85)] overflow-hidden"
-          style={{
-            willChange: "transform",
-            backfaceVisibility: "hidden",
-            WebkitBackfaceVisibility: "hidden",
-          }}
-        >
-          {/* Metallic Top Border Highlight */}
-          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[#58a6ff]/50 to-transparent z-30" />
+        <div className="flex items-center gap-2 shrink-0 text-[11px] text-[#A1A39B]">
+          <span className="w-1.5 h-1.5 bg-[#C5F467] rounded-none" />
+          <span className="hidden sm:inline">AST Indexed</span>
+        </div>
+      </div>
 
-          {/* Window Header Bar */}
-          <div className="flex items-center justify-between px-4 py-3 bg-[#161b22] border-b border-[#30363d] relative z-20">
-            {/* macOS Style Window Controls */}
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]/40 shadow-sm" />
-              <div className="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#dea123]/40 shadow-sm" />
-              <div className="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29]/40 shadow-sm" />
-              
-              <span className="ml-3 text-xs font-semibold text-slate-300 flex items-center gap-1.5 font-mono">
-                <Terminal className="w-3.5 h-3.5 text-[#58a6ff]" />
-                paraspathania / repowiki-ai
-              </span>
+      {/* Main Split Layout: Left Mini Tree + Right Code & Context */}
+      <div className="grid grid-cols-1 sm:grid-cols-12 min-h-[360px] font-mono text-xs">
+        
+        {/* Left Mini Tree (4 cols) */}
+        <div className="sm:col-span-4 bg-[#141514] border-b sm:border-b-0 sm:border-r border-[rgba(232,232,223,0.08)] p-2.5 flex flex-col justify-between">
+          <div className="space-y-1">
+            <div className="text-[10px] uppercase tracking-wider text-[#A1A39B] px-2 py-1 font-semibold flex items-center justify-between">
+              <span>EXPLORER</span>
+              <span className="text-[9px] text-[#C5F467]">342 files</span>
             </div>
 
-            {/* Middle Live Status Pill */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-[#21262d] border border-[#30363d] rounded-full text-xs text-slate-300 font-mono">
-              <span className="w-2 h-2 rounded-full bg-[#3fb950] animate-ping" />
-              <span>LIVE REPOSITORY PLATFORM</span>
-              <span className="text-slate-500">|</span>
-              <span className="text-[#58a6ff] font-semibold">{MODES.find(m => m.id === activeMode)?.fileName}</span>
-            </div>
+            <div className="space-y-0.5 pt-1">
+              <div className="text-[11px] text-[#A1A39B] px-2 py-1 flex items-center gap-1.5">
+                <FolderOpen className="w-3.5 h-3.5 text-[#A1A39B]" />
+                <span>backend/app/</span>
+              </div>
 
-            {/* Playback Controls */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 hover:text-white transition border border-white/10 text-xs flex items-center gap-1.5"
-                title={isPlaying ? "Pause Demo" : "Play Demo"}
-              >
-                {isPlaying ? (
-                  <>
-                    <Pause className="w-3.5 h-3.5 text-amber-400" />
-                    <span className="hidden sm:inline font-mono">Pause</span>
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400" />
-                    <span className="hidden sm:inline font-mono">Auto Play</span>
-                  </>
-                )}
-              </button>
+              <div className="pl-3 space-y-0.5">
+                <button
+                  onClick={() => setSelectedKey("ast_analyzer.py")}
+                  className={`w-full text-left px-2 py-1.5 rounded-sm flex items-center gap-1.5 transition-colors text-xs ${
+                    selectedKey === "ast_analyzer.py"
+                      ? "bg-[#101110] text-[#E8E8DF] font-medium border-l-2 border-[#C5F467]"
+                      : "text-[#A1A39B] hover:text-[#E8E8DF] hover:bg-[#191A18]"
+                  }`}
+                >
+                  <FileCode className="w-3.5 h-3.5 text-[#C5F467]" />
+                  <span className="truncate">ast_analyzer.py</span>
+                </button>
 
-              <button
-                onClick={() => setProgress(0)}
-                className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-400 hover:text-white transition border border-white/10"
-                title="Restart Animation"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-              </button>
+                <button
+                  onClick={() => setSelectedKey("client.py")}
+                  className={`w-full text-left px-2 py-1.5 rounded-sm flex items-center gap-1.5 transition-colors text-xs ${
+                    selectedKey === "client.py"
+                      ? "bg-[#101110] text-[#E8E8DF] font-medium border-l-2 border-[#C5F467]"
+                      : "text-[#A1A39B] hover:text-[#E8E8DF] hover:bg-[#191A18]"
+                  }`}
+                >
+                  <FileCode className="w-3.5 h-3.5 text-[#A1A39B]" />
+                  <span className="truncate">client.py</span>
+                </button>
+              </div>
+
+              <div className="text-[11px] text-[#A1A39B] px-2 py-1 flex items-center gap-1.5 pt-1">
+                <FolderOpen className="w-3.5 h-3.5 text-[#A1A39B]" />
+                <span>frontend/src/</span>
+              </div>
+
+              <div className="pl-3 space-y-0.5">
+                <button
+                  onClick={() => setSelectedKey("auth-context.tsx")}
+                  className={`w-full text-left px-2 py-1.5 rounded-sm flex items-center gap-1.5 transition-colors text-xs ${
+                    selectedKey === "auth-context.tsx"
+                      ? "bg-[#101110] text-[#E8E8DF] font-medium border-l-2 border-[#C5F467]"
+                      : "text-[#A1A39B] hover:text-[#E8E8DF] hover:bg-[#191A18]"
+                  }`}
+                >
+                  <FileCode className="w-3.5 h-3.5 text-[#C5F467]" />
+                  <span className="truncate">auth-context.tsx</span>
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Main Content Workspace */}
-          <div className="relative min-h-[400px] sm:min-h-[460px] md:min-h-[500px] bg-[#05070a] flex flex-col md:flex-row overflow-hidden font-mono text-xs sm:text-sm">
-            
-            {/* Left Interactive Explorer Sidebar */}
-            <div className="w-full md:w-60 bg-[#090c12] border-b md:border-b-0 md:border-r border-white/[0.06] p-3 flex flex-col justify-between select-none">
-              <div className="space-y-4">
-                <div className="text-[11px] font-bold text-slate-400 tracking-wider uppercase flex items-center justify-between">
-                  <span>PLATFORM HUB</span>
-                  <Sparkles className="w-3 h-3 text-indigo-400" />
-                </div>
-
-                <div className="space-y-1">
-                  {MODES.map((mode) => {
-                    const Icon = mode.icon;
-                    const isActive = activeMode === mode.id;
-                    return (
-                      <button
-                        key={mode.id}
-                        onClick={() => handleModeSelect(mode.id)}
-                        className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center justify-between transition-all group ${
-                          isActive
-                            ? "bg-indigo-600/25 text-indigo-200 border border-indigo-500/40 font-semibold shadow-lg shadow-indigo-950/40"
-                            : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 truncate">
-                          <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-indigo-400" : "text-slate-500 group-hover:text-slate-300"}`} />
-                          <span className="truncate text-xs sm:text-sm">{mode.label}</span>
-                        </div>
-                        {isActive && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shadow-[0_0_8px_#818cf8]" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Status Badge */}
-              <div className="pt-3 border-t border-white/[0.06] mt-3 hidden md:block">
-                <div className="flex items-center gap-2 text-slate-400 text-xs">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <div className="text-[11px] leading-tight text-slate-400">
-                    <span className="font-semibold text-slate-300">RepoWiki Engine</span>
-                    <div>342 files parsed</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Main Interactive Content Canvas */}
-            <div className="flex-1 p-4 sm:p-6 overflow-y-auto relative bg-gradient-to-b from-[#080b11] via-[#05070a] to-[#040508] custom-scrollbar">
-              
-              {/* Scanline Effect */}
-              <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/[0.02] via-transparent to-transparent pointer-events-none animate-scanline" />
-
-              {/* MODE 1: CODE WALKTHROUGH */}
-              {activeMode === "code" && (
-                <div className="space-y-4 animate-fade-in">
-                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setSelectedFile("auth-context.tsx")}
-                        className={`px-2.5 py-1 rounded text-xs transition ${
-                          selectedFile === "auth-context.tsx"
-                            ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-semibold"
-                            : "text-slate-400 hover:text-white"
-                        }`}
-                      >
-                        auth-context.tsx
-                      </button>
-                      <button
-                        onClick={() => setSelectedFile("client.ts")}
-                        className={`px-2.5 py-1 rounded text-xs transition ${
-                          selectedFile === "client.ts"
-                            ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-semibold"
-                            : "text-slate-400 hover:text-white"
-                        }`}
-                      >
-                        client.ts
-                      </button>
-                      <button
-                        onClick={() => setSelectedFile("page.tsx")}
-                        className={`px-2.5 py-1 rounded text-xs transition ${
-                          selectedFile === "page.tsx"
-                            ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-semibold"
-                            : "text-slate-400 hover:text-white"
-                        }`}
-                      >
-                        page.tsx
-                      </button>
-                    </div>
-
-                    <button
-                      onClick={() => handleCopyCode("export function AuthProvider({ children }) { ... }")}
-                      className="text-xs text-slate-400 hover:text-white flex items-center gap-1 bg-white/[0.04] px-2 py-1 rounded border border-white/[0.08]"
-                    >
-                      {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                      <span>{copied ? "Copied" : "Copy"}</span>
-                    </button>
-                  </div>
-
-                  {selectedFile === "auth-context.tsx" && (
-                    <div className="space-y-1.5 font-mono text-xs sm:text-sm leading-relaxed">
-                      <div className="text-slate-500">// 1. Context definition for user authentication</div>
-                      <div>
-                        <span className="text-purple-400">export</span>{" "}
-                        <span className="text-purple-400">interface</span>{" "}
-                        <span className="text-amber-300">AuthContextType</span> {"{"}
-                      </div>
-                      <div className="pl-4 text-slate-300">
-                        user: <span className="text-blue-300">User</span> | <span className="text-purple-400">null</span>;
-                      </div>
-                      <div className="pl-4 text-slate-300">
-                        isLoading: <span className="text-blue-300">boolean</span>;
-                      </div>
-                      <div className="pl-4 text-slate-300">
-                        loginWithGithub: () =&gt; <span className="text-blue-300">Promise</span>&lt;<span className="text-purple-400">void</span>&gt;;
-                      </div>
-                      <div>{"}"}</div>
-
-                      <div className="bg-indigo-950/30 border border-indigo-500/30 rounded-xl p-3 my-2 text-xs space-y-2 shadow-lg">
-                        <div className="flex items-center gap-2 text-indigo-300 font-semibold">
-                          <Sparkles className="w-4 h-4 text-indigo-400" />
-                          <span>RepoWiki AST Analysis:</span>
-                        </div>
-                        <p className="text-slate-300 leading-normal font-sans text-xs sm:text-sm">
-                          Manages client authentication state using React Context. Hydrates session token from localStorage and triggers automated query cache invalidation.
-                        </p>
-                        <div className="flex items-center gap-2 text-[11px] text-slate-400">
-                          <span className="bg-slate-800 text-indigo-300 px-2 py-0.5 rounded border border-slate-700">
-                            Lines 14–38
-                          </span>
-                          <span className="text-emerald-400">✔ Grounded AST Citation</span>
-                        </div>
-                      </div>
-
-                      <div className="text-slate-500">// 2. Provider component with persistent state</div>
-                      <div>
-                        <span className="text-purple-400">export</span>{" "}
-                        <span className="text-purple-400">function</span>{" "}
-                        <span className="text-blue-400">AuthProvider</span>({'{ children }'}: {'{ children: React.ReactNode }'}) {"{"}
-                      </div>
-                      <div className="pl-4 text-slate-300">
-                        <span className="text-purple-400">const</span> [user, setUser] = <span className="text-blue-400">useState</span>&lt;<span className="text-amber-300">User</span> | <span className="text-purple-400">null</span>&gt;(<span className="text-purple-400">null</span>);
-                      </div>
-                      <div className="pl-4 text-slate-300">
-                        <span className="text-purple-400">return</span> (
-                      </div>
-                      <div className="pl-8 text-slate-300">
-                        &lt;<span className="text-emerald-400">AuthContext.Provider</span> value={"{{ user }}"}&gt;
-                      </div>
-                      <div className="pl-12 text-slate-300">{"{children}"}</div>
-                      <div className="pl-8 text-slate-300">&lt;/<span className="text-emerald-400">AuthContext.Provider</span>&gt;
-                      </div>
-                      <div className="pl-4 text-slate-300">);</div>
-                      <div>{"}"}</div>
-                    </div>
-                  )}
-
-                  {selectedFile === "client.ts" && (
-                    <div className="space-y-1.5 font-mono text-xs sm:text-sm leading-relaxed">
-                      <div className="text-slate-500">// Axios Client Setup with JWT Interceptor</div>
-                      <div>
-                        <span className="text-purple-400">import</span> axios <span className="text-purple-400">from</span> <span className="text-emerald-300">"axios"</span>;
-                      </div>
-                      <div className="py-1" />
-                      <div>
-                        <span className="text-purple-400">export</span> <span className="text-purple-400">const</span> <span className="text-blue-400">apiClient</span> = axios.<span className="text-blue-300">create</span>({"{"}
-                      </div>
-                      <div className="pl-4 text-slate-300">
-                        baseURL: <span className="text-emerald-300">"https://api.repowiki.ai/v1"</span>,
-                      </div>
-                      <div className="pl-4 text-slate-300">
-                        headers: {"{ 'Content-Type': 'application/json' }"},
-                      </div>
-                      <div>{"});"}</div>
-                    </div>
-                  )}
-
-                  {selectedFile === "page.tsx" && (
-                    <div className="space-y-1.5 font-mono text-xs sm:text-sm leading-relaxed">
-                      <div className="text-slate-500">// Root Next.js Homepage Container</div>
-                      <div>
-                        <span className="text-purple-400">export default</span> <span className="text-purple-400">function</span> <span className="text-blue-400">HomePage</span>() {"{"}
-                      </div>
-                      <div className="pl-4 text-slate-300">
-                        <span className="text-purple-400">return</span> (
-                      </div>
-                      <div className="pl-8 text-emerald-400">&lt;main className="min-h-screen bg-background"&gt;</div>
-                      <div className="pl-12 text-slate-300">&lt;Hero3DShowcase /&gt;</div>
-                      <div className="pl-8 text-emerald-400">&lt;/main&gt;</div>
-                      <div className="pl-4 text-slate-300">);</div>
-                      <div>{"}"}</div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* MODE 2: TECHNICAL WIKI */}
-              {activeMode === "wiki" && (
-                <div className="space-y-4 animate-fade-in font-sans">
-                  {/* Sub Wiki Navbar */}
-                  <div className="flex items-center gap-2 border-b border-white/[0.06] pb-3 overflow-x-auto no-scrollbar font-mono text-xs">
-                    <button
-                      onClick={() => setSelectedWikiPage("overview")}
-                      className={`px-3 py-1 rounded-lg transition whitespace-nowrap ${
-                        selectedWikiPage === "overview"
-                          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold"
-                          : "text-slate-400 hover:text-white"
-                      }`}
-                    >
-                      1. Project Overview
-                    </button>
-                    <button
-                      onClick={() => setSelectedWikiPage("architecture")}
-                      className={`px-3 py-1 rounded-lg transition whitespace-nowrap ${
-                        selectedWikiPage === "architecture"
-                          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold"
-                          : "text-slate-400 hover:text-white"
-                      }`}
-                    >
-                      2. Architecture & RAG
-                    </button>
-                    <button
-                      onClick={() => setSelectedWikiPage("techstack")}
-                      className={`px-3 py-1 rounded-lg transition whitespace-nowrap ${
-                        selectedWikiPage === "techstack"
-                          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold"
-                          : "text-slate-400 hover:text-white"
-                      }`}
-                    >
-                      3. Tech Stack Matrix
-                    </button>
-                  </div>
-
-                  {selectedWikiPage === "overview" && (
-                    <div className="space-y-3 text-slate-200">
-                      <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-emerald-400" />
-                        Project Overview & Technical Wiki
-                      </h2>
-                      <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                        RepoWiki AI automatically transforms raw software codebases into 14 structured, interactive documentation modules using AST parser trees and Gemini RAG embeddings.
-                      </p>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 py-2 font-mono text-xs">
-                        <div className="p-3 bg-white/[0.03] border border-white/[0.08] rounded-xl space-y-1">
-                          <div className="text-indigo-400 font-bold">14 Wiki Pages</div>
-                          <div className="text-slate-400 text-[11px]">Overview to Deployment</div>
-                        </div>
-                        <div className="p-3 bg-white/[0.03] border border-white/[0.08] rounded-xl space-y-1">
-                          <div className="text-emerald-400 font-bold">100% Grounded</div>
-                          <div className="text-slate-400 text-[11px]">Direct Line Citations</div>
-                        </div>
-                        <div className="p-3 bg-white/[0.03] border border-white/[0.08] rounded-xl space-y-1">
-                          <div className="text-purple-400 font-bold">Auto-Sync</div>
-                          <div className="text-slate-400 text-[11px]">Syncs on Git Push</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedWikiPage === "architecture" && (
-                    <div className="space-y-3 text-slate-200">
-                      <h2 className="text-lg font-bold text-white tracking-tight">
-                        Architecture & RAG Pipeline
-                      </h2>
-                      <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                        Follows a Decoupled Modular Monolith pattern. Code files are parsed with Tree-Sitter into symbol trees, chunked by scope, and indexed in pgvector.
-                      </p>
-                      <div className="bg-[#0b0e14] border border-white/[0.08] rounded-xl p-3 font-mono text-xs text-indigo-300 space-y-1">
-                        <div>Git Repository → Tree-Sitter AST → Vector Embeddings → RAG Citation Engine</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedWikiPage === "techstack" && (
-                    <div className="space-y-3 text-slate-200">
-                      <h2 className="text-lg font-bold text-white tracking-tight">
-                        Core Tech Stack
-                      </h2>
-                      <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                        <div className="p-2.5 bg-slate-900 border border-slate-800 rounded-lg">Next.js 14 (App Router)</div>
-                        <div className="p-2.5 bg-slate-900 border border-slate-800 rounded-lg">TypeScript 5.4</div>
-                        <div className="p-2.5 bg-slate-900 border border-slate-800 rounded-lg">FastAPI & Python 3.11</div>
-                        <div className="p-2.5 bg-slate-900 border border-slate-800 rounded-lg">Mermaid.js Visualizer</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* MODE 3: ARCHITECTURE VISUALIZER */}
-              {activeMode === "architecture" && (
-                <div className="space-y-4 animate-fade-in">
-                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-3 font-mono text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40 font-semibold">
-                        System Map
-                      </span>
-                      <span className="text-slate-400">Mermaid Visualizer</span>
-                    </div>
-                    <span className="text-emerald-400 flex items-center gap-1">
-                      <Zap className="w-3.5 h-3.5" /> 6 Active Nodes Connected
-                    </span>
-                  </div>
-
-                  <div className="relative h-64 sm:h-72 w-full bg-[#07090e] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between overflow-hidden">
-                    <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                      <line x1="20%" y1="25%" x2="50%" y2="50%" stroke="#6366f1" strokeWidth="2" strokeDasharray="4" className="animate-pulse" />
-                      <line x1="80%" y1="25%" x2="50%" y2="50%" stroke="#a855f7" strokeWidth="2" strokeDasharray="4" className="animate-pulse" />
-                      <line x1="50%" y1="50%" x2="30%" y2="80%" stroke="#10b981" strokeWidth="2" />
-                      <line x1="50%" y1="50%" x2="70%" y2="80%" stroke="#3b82f6" strokeWidth="2" />
-                    </svg>
-
-                    <div className="flex justify-between relative z-10 text-xs">
-                      <div className="p-3 bg-indigo-950/80 border border-indigo-500/50 rounded-xl text-indigo-200 font-semibold shadow-xl flex items-center gap-2">
-                        <Cpu className="w-4 h-4 text-indigo-400" />
-                        <span>Frontend Client</span>
-                      </div>
-                      <div className="p-3 bg-purple-950/80 border border-purple-500/50 rounded-xl text-purple-200 font-semibold shadow-xl flex items-center gap-2">
-                        <Layers className="w-4 h-4 text-purple-400" />
-                        <span>API Gateway</span>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-center relative z-10 text-xs">
-                      <div className="p-3 bg-slate-900 border border-indigo-400/60 rounded-xl text-white font-bold shadow-2xl flex items-center gap-2 bg-gradient-to-r from-indigo-900/50 to-purple-900/50">
-                        <Sparkles className="w-4 h-4 text-amber-400 animate-spin" />
-                        <span>RepoWiki AST Core Engine</span>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between relative z-10 text-xs">
-                      <div className="p-3 bg-emerald-950/80 border border-emerald-500/50 rounded-xl text-emerald-200 font-semibold shadow-xl flex items-center gap-2">
-                        <Database className="w-4 h-4 text-emerald-400" />
-                        <span>Vector Store</span>
-                      </div>
-                      <div className="p-3 bg-blue-950/80 border border-blue-500/50 rounded-xl text-blue-200 font-semibold shadow-xl flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-blue-400" />
-                        <span>Citation Verifier</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* MODE 4: GROUNDED AI CHAT */}
-              {activeMode === "chat" && (
-                <div className="space-y-4 animate-fade-in font-sans">
-                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-3 font-mono text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/40 font-semibold">
-                        Grounded RAG Assistant
-                      </span>
-                      <span className="text-slate-400">Interactive Session</span>
-                    </div>
-                    <span className="text-blue-400">98.9% Verification Confidence</span>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex justify-end">
-                      <div className="bg-indigo-600 text-white rounded-2xl rounded-tr-none px-4 py-2.5 max-w-sm text-xs sm:text-sm font-medium shadow-lg">
-                        How is user authentication state persisted across routes?
-                      </div>
-                    </div>
-
-                    <div className="flex justify-start">
-                      <div className="bg-slate-900 border border-white/[0.1] text-slate-200 rounded-2xl rounded-tl-none p-4 max-w-md space-y-2.5 text-xs sm:text-sm shadow-xl">
-                        <div className="flex items-center gap-2 text-indigo-400 font-bold font-mono text-xs">
-                          <Sparkles className="w-4 h-4" />
-                          <span>RepoWiki Assistant</span>
-                        </div>
-                        <p className="leading-relaxed text-slate-300">
-                          Authentication state is hydrated inside <code className="text-amber-300 bg-amber-950/50 px-1.5 py-0.5 rounded font-mono">AuthProvider</code> using React Context and cached localStorage tokens.
-                        </p>
-
-                        <div className="pt-2 border-t border-white/[0.08] space-y-1.5 font-mono text-[11px]">
-                          <div className="text-slate-400 font-semibold">Source Citations:</div>
-                          <div className="flex flex-wrap gap-1.5">
-                            <span className="bg-indigo-950 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded flex items-center gap-1">
-                              <span>auth-context.tsx:L14-38</span>
-                              <ExternalLink className="w-3 h-3" />
-                            </span>
-                            <span className="bg-purple-950 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded flex items-center gap-1">
-                              <span>providers.tsx:L8</span>
-                              <ExternalLink className="w-3 h-3" />
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* MODE 5: APIS & SCHEMA */}
-              {activeMode === "apis" && (
-                <div className="space-y-4 animate-fade-in font-sans">
-                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-3 font-mono text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold">
-                        API Explorer
-                      </span>
-                      <span className="text-slate-400">REST Endpoints & ERD</span>
-                    </div>
-                    <span className="text-amber-400">OpenAPI 3.0 Extracted</span>
-                  </div>
-
-                  <div className="space-y-3 font-mono text-xs">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setSelectedApiRoute("GET /api/v1/repos/{id}/wiki")}
-                        className={`px-3 py-1.5 rounded-lg border text-left flex items-center gap-2 transition ${
-                          selectedApiRoute.startsWith("GET")
-                            ? "bg-blue-950/60 border-blue-500/50 text-blue-300 font-semibold"
-                            : "bg-slate-900 border-slate-800 text-slate-400"
-                        }`}
-                      >
-                        <span className="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[10px]">GET</span>
-                        <span>/api/v1/repos/{'{id}'}/wiki</span>
-                      </button>
-                      <button
-                        onClick={() => setSelectedApiRoute("POST /api/v1/repos/analyze")}
-                        className={`px-3 py-1.5 rounded-lg border text-left flex items-center gap-2 transition ${
-                          selectedApiRoute.startsWith("POST")
-                            ? "bg-emerald-950/60 border-emerald-500/50 text-emerald-300 font-semibold"
-                            : "bg-slate-900 border-slate-800 text-slate-400"
-                        }`}
-                      >
-                        <span className="bg-emerald-600 text-white px-1.5 py-0.5 rounded text-[10px]">POST</span>
-                        <span>/api/v1/repos/analyze</span>
-                      </button>
-                    </div>
-
-                    <div className="bg-[#0b0e15] border border-white/[0.08] rounded-xl p-3 space-y-2 text-slate-300">
-                      <div className="flex items-center justify-between text-slate-400">
-                        <span>Response JSON Schema (200 OK)</span>
-                        <span className="text-emerald-400">application/json</span>
-                      </div>
-                      <pre className="text-xs text-indigo-300 leading-relaxed font-mono">
-{`{
-  "repository_id": "repo-123",
-  "full_name": "paraspathania/repowiki-ai",
-  "wiki_sections": [
-    { "title": "Overview", "slug": "overview" },
-    { "title": "Architecture", "slug": "architecture" }
-  ]
-}`}
-                      </pre>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* MODE 6: SECURITY & SAIF */}
-              {activeMode === "security" && (
-                <div className="space-y-4 animate-fade-in font-sans">
-                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-3 font-mono text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold">
-                        SAIF Compliant
-                      </span>
-                      <span className="text-slate-400">Security Audit</span>
-                    </div>
-                    <span className="text-emerald-400 flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> 100% Passed
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
-                    <div className="p-3 bg-emerald-950/30 border border-emerald-500/30 rounded-xl space-y-1">
-                      <div className="text-emerald-300 font-bold flex items-center gap-1.5">
-                        <Lock className="w-4 h-4 text-emerald-400" />
-                        <span>Secret Masking</span>
-                      </div>
-                      <p className="text-slate-400 font-sans text-xs">
-                        Zero API keys, JWT secrets, or tokens exposed in generated wikis.
-                      </p>
-                    </div>
-
-                    <div className="p-3 bg-indigo-950/30 border border-indigo-500/30 rounded-xl space-y-1">
-                      <div className="text-indigo-300 font-bold flex items-center gap-1.5">
-                        <ShieldCheck className="w-4 h-4 text-indigo-400" />
-                        <span>Dependency Audit</span>
-                      </div>
-                      <p className="text-slate-400 font-sans text-xs">
-                        All 39 npm & pip packages scanned against vulnerability databases.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-            </div>
-          </div>
-
-          {/* Bottom Progress Bar */}
-          <div className="w-full bg-[#161b22] h-1 relative overflow-hidden border-t border-[#30363d]">
-            <div
-              className="h-full bg-[#58a6ff] transition-all duration-100 ease-linear"
-              style={{ width: `${progress}%` }}
-            />
+          <div className="pt-3 border-t border-[rgba(232,232,223,0.06)] px-2 text-[10px] text-[#A1A39B] flex items-center justify-between">
+            <span>Syntax: Tree-Sitter</span>
+            <span className="text-[#C5F467]">OK</span>
           </div>
         </div>
 
-        {/* Bottom Interactive Feature Tab Bar */}
-        <div className="mt-8 flex justify-center">
-          <div className="inline-flex items-center gap-1 sm:gap-2 p-1.5 bg-[#0d1117] border border-[#30363d] rounded-full shadow-2xl max-w-full overflow-x-auto no-scrollbar">
-            {MODES.map((mode) => {
-              const Icon = mode.icon;
-              const isActive = activeMode === mode.id;
-              return (
-                <button
-                  key={mode.id}
-                  onClick={() => handleModeSelect(mode.id)}
-                  className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2.5 whitespace-nowrap ${
-                    isActive
-                      ? "bg-[#21262d] text-white border border-[#484f58] shadow-md"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-[#161b22]"
-                  }`}
-                >
-                  <Icon className={`w-4 h-4 ${isActive ? "text-blue-400" : "text-slate-500"}`} />
-                  <span>{mode.label}</span>
-                </button>
-              );
-            })}
+        {/* Right Code Excerpt & Grounded Explanation (8 cols) */}
+        <div className="sm:col-span-8 flex flex-col justify-between bg-[#101110]">
+          {/* File Header */}
+          <div className="flex items-center justify-between px-3.5 py-2 bg-[#141514] border-b border-[rgba(232,232,223,0.08)] text-[11px]">
+            <span className="text-[#E8E8DF] font-medium truncate">{activeFile.path}</span>
+            <button
+              onClick={() => handleCopy(activeFile.code)}
+              className="text-[#A1A39B] hover:text-[#E8E8DF] flex items-center gap-1 px-1.5 py-0.5 rounded-sm border border-[rgba(232,232,223,0.08)]"
+              title="Copy snippet"
+            >
+              {copied ? <Check className="w-3 h-3 text-[#C5F467]" /> : <Copy className="w-3 h-3" />}
+              <span>{copied ? "Copied" : "Copy"}</span>
+            </button>
           </div>
+
+          {/* Syntax Code Block */}
+          <div className="p-3.5 text-xs text-[#E8E8DF] font-mono leading-relaxed overflow-x-auto whitespace-pre">
+            {activeFile.code}
+          </div>
+
+          {/* Contextual Explanation Panel */}
+          <div className="p-3 bg-[#191A18] border-t border-[rgba(232,232,223,0.1)] space-y-2">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-[#C5F467] font-semibold flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>{activeFile.explanation.title}</span>
+              </span>
+              <span className="text-[#A1A39B] text-[10px]">{activeFile.explanation.references}</span>
+            </div>
+
+            <p className="font-sans text-xs text-[#A1A39B] leading-relaxed">
+              {activeFile.explanation.description}
+            </p>
+
+            <div className="pt-1 text-[11px] text-[#E8E8DF] font-mono flex items-center gap-2">
+              <span className="px-1.5 py-0.5 bg-[#101110] border border-[rgba(232,232,223,0.1)] text-[#A1A39B]">
+                {activeFile.explanation.citations}
+              </span>
+              <span className="text-[#C5F467]">✔ Grounded Citation</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Integrated Product Demonstration Workbench for Section 3
+ */
+export function Hero3DShowcase() {
+  const [activeTab, setActiveTab] = useState<"wiki" | "architecture" | "chat" | "apis" | "database">("wiki");
+  const [wikiChapter, setWikiChapter] = useState<number>(1);
+
+  return (
+    <div className="w-full space-y-4">
+      {/* Workbench Header & Tab Navigation */}
+      <div className="border border-[rgba(232,232,223,0.12)] bg-[#191A18] rounded-md overflow-hidden">
+        
+        {/* Editorial Subtitle & Tab Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[rgba(232,232,223,0.08)] bg-[#141514] px-4 py-3 gap-3">
+          <div className="flex items-center gap-2 font-mono text-xs">
+            <span className="text-[#C5F467] font-bold">WORKBENCH //</span>
+            <span className="text-[#E8E8DF] font-medium">paraspathania/repowiki-ai</span>
+          </div>
+
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar font-mono text-xs">
+            {[
+              { id: "wiki", label: "01 Technical Wiki" },
+              { id: "architecture", label: "02 Architecture Map" },
+              { id: "chat", label: "03 Grounded AI Chat" },
+              { id: "apis", label: "04 APIs Hub" },
+              { id: "database", label: "05 Database ERD" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`px-3 py-1.5 rounded-sm whitespace-nowrap transition-colors ${
+                  activeTab === tab.id
+                    ? "bg-[#101110] text-[#E8E8DF] border-b-2 border-[#C5F467] font-medium"
+                    : "text-[#A1A39B] hover:text-[#E8E8DF] hover:bg-[#191A18]"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tab Content Display */}
+        <div className="p-5 sm:p-6 bg-[#101110] min-h-[380px]">
+          
+          {/* TAB 1: TECHNICAL WIKI */}
+          {activeTab === "wiki" && (
+            <div className="space-y-5">
+              <div className="flex items-center justify-between border-b border-[rgba(232,232,223,0.08)] pb-3 flex-wrap gap-2 font-mono text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="text-[#C5F467]">CHAPTERS:</span>
+                  {[1, 2, 3, 4].map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => setWikiChapter(num)}
+                      className={`px-2 py-0.5 rounded-sm border ${
+                        wikiChapter === num
+                          ? "bg-[#191A18] border-[#C5F467] text-[#E8E8DF] font-semibold"
+                          : "border-[rgba(232,232,223,0.08)] text-[#A1A39B] hover:text-[#E8E8DF]"
+                      }`}
+                    >
+                      0{num}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="text-[11px] text-[#A1A39B] flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#C5F467]" />
+                  <span>100% Grounded in Tree-Sitter AST</span>
+                </div>
+              </div>
+
+              {wikiChapter === 1 && (
+                <div className="space-y-4">
+                  <h3 className="text-xl sm:text-2xl font-bold text-[#E8E8DF] tracking-tight">
+                    Chapter 1: System Overview & Architecture
+                  </h3>
+                  <p className="text-sm text-[#A1A39B] leading-relaxed max-w-3xl">
+                    RepoWiki AI implements a decoupled Modular Monolith architecture. The backend service parses GitHub repository trees, generates Tree-Sitter abstract syntax trees, and produces grounded multi-chapter technical documentation without requiring build steps.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs pt-2">
+                    <div className="p-3 bg-[#191A18] border border-[rgba(232,232,223,0.08)] rounded-sm space-y-1">
+                      <div className="text-[#C5F467] font-bold">5 Documentation Chapters</div>
+                      <div className="text-[#A1A39B] text-[11px]">System boundaries to API tables</div>
+                    </div>
+                    <div className="p-3 bg-[#191A18] border border-[rgba(232,232,223,0.08)] rounded-sm space-y-1">
+                      <div className="text-[#E8E8DF] font-bold">Line-Level Verified</div>
+                      <div className="text-[#A1A39B] text-[11px]">Direct citations to exact source lines</div>
+                    </div>
+                    <div className="p-3 bg-[#191A18] border border-[rgba(232,232,223,0.08)] rounded-sm space-y-1">
+                      <div className="text-[#A1A39B] font-bold">Zero Setup Required</div>
+                      <div className="text-[#A1A39B] text-[11px]">No CLI, SSH keys or tokens</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {wikiChapter !== 1 && (
+                <div className="space-y-3 font-mono text-xs">
+                  <h4 className="text-base font-bold text-[#E8E8DF]">
+                    {wikiChapter === 2 && "Chapter 2: Modular Architecture & Service Boundaries"}
+                    {wikiChapter === 3 && "Chapter 3: Tree-Sitter AST & Semantic Symbol Extraction"}
+                    {wikiChapter === 4 && "Chapter 4: Vector Grounding & RAG Citation Pipeline"}
+                  </h4>
+                  <p className="font-sans text-sm text-[#A1A39B] leading-relaxed">
+                    Abstract syntax trees map every imported module, class declaration, and route handler into verifiable symbol nodes stored in pgvector.
+                  </p>
+                  <div className="p-3 bg-[#191A18] border border-[rgba(232,232,223,0.08)] rounded-sm text-[#C5F467]">
+                    Tree-Sitter v0.21.3 • FastAPI Gateway • pgvector 0.2.5
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 2: ARCHITECTURE MAP */}
+          {activeTab === "architecture" && (
+            <div className="space-y-4 font-mono text-xs">
+              <div className="flex items-center justify-between border-b border-[rgba(232,232,223,0.08)] pb-2 text-[11px] text-[#A1A39B]">
+                <span>TOPOLOGY: DECOUPLED MODULAR MONOLITH</span>
+                <span className="text-[#C5F467]">6 Active Verified Nodes</span>
+              </div>
+
+              <div className="relative h-64 w-full bg-[#141514] border border-[rgba(232,232,223,0.08)] rounded-sm p-4 flex flex-col justify-between">
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
+                  <line x1="20%" y1="20%" x2="50%" y2="50%" stroke="rgba(232, 232, 223, 0.2)" strokeWidth="1" strokeDasharray="3" />
+                  <line x1="80%" y1="20%" x2="50%" y2="50%" stroke="rgba(232, 232, 223, 0.2)" strokeWidth="1" strokeDasharray="3" />
+                  <line x1="50%" y1="50%" x2="25%" y2="80%" stroke="#C5F467" strokeWidth="1" />
+                  <line x1="50%" y1="50%" x2="75%" y2="80%" stroke="#C5F467" strokeWidth="1" />
+                </svg>
+
+                <div className="flex justify-between relative z-10">
+                  <div className="p-2.5 bg-[#191A18] border border-[rgba(232,232,223,0.12)] rounded-sm">
+                    <div className="text-[#E8E8DF] font-bold">Frontend Client</div>
+                    <div className="text-[10px] text-[#A1A39B]">Next.js 14 App Router</div>
+                  </div>
+                  <div className="p-2.5 bg-[#191A18] border border-[rgba(232,232,223,0.12)] rounded-sm">
+                    <div className="text-[#E8E8DF] font-bold">API Gateway</div>
+                    <div className="text-[10px] text-[#A1A39B]">FastAPI Framework</div>
+                  </div>
+                </div>
+
+                <div className="flex justify-center relative z-10">
+                  <div className="p-3 bg-[#191A18] border border-[#C5F467] rounded-sm text-center">
+                    <div className="text-[#E8E8DF] font-bold">Tree-Sitter AST & Semantic Engine</div>
+                    <div className="text-[10px] text-[#C5F467]">Maps syntax symbols, routes & dependencies</div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between relative z-10">
+                  <div className="p-2.5 bg-[#191A18] border border-[rgba(232,232,223,0.12)] rounded-sm">
+                    <div className="text-[#E8E8DF] font-bold">pgvector Embeddings</div>
+                    <div className="text-[10px] text-[#A1A39B]">Semantic Vector Index</div>
+                  </div>
+                  <div className="p-2.5 bg-[#191A18] border border-[rgba(232,232,223,0.12)] rounded-sm">
+                    <div className="text-[#E8E8DF] font-bold">Citation Verifier</div>
+                    <div className="text-[10px] text-[#C5F467]">100% Line Number Match</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: GROUNDED AI CHAT */}
+          {activeTab === "chat" && (
+            <div className="space-y-4 font-mono text-xs">
+              <div className="flex items-center justify-between border-b border-[rgba(232,232,223,0.08)] pb-2 text-[11px] text-[#A1A39B]">
+                <span>GROUNDED RAG CHAT</span>
+                <span className="text-[#C5F467]">Verification Score: 99.4%</span>
+              </div>
+
+              <div className="space-y-3 font-sans">
+                <div className="flex justify-end">
+                  <div className="bg-[#191A18] border border-[rgba(232,232,223,0.12)] text-[#E8E8DF] p-3 rounded-sm max-w-lg text-xs font-mono">
+                    How does the AST engine discover REST API routes in FastAPI without execution?
+                  </div>
+                </div>
+
+                <div className="flex justify-start">
+                  <div className="bg-[#141514] border border-[rgba(232,232,223,0.12)] text-[#A1A39B] p-4 rounded-sm max-w-xl space-y-2.5 text-xs">
+                    <div className="font-mono text-[#C5F467] font-semibold text-[11px]">
+                      RepoWiki Code Intelligence:
+                    </div>
+                    <p className="leading-relaxed text-[#E8E8DF]">
+                      RepoWiki uses Tree-Sitter visitors to inspect decorator syntax nodes (e.g. <code className="text-[#C5F467] bg-[#101110] px-1 py-0.5 rounded-sm font-mono">@router.get</code>) and endpoint function signatures directly in the AST grammar. Parameters and response models are parsed into symbol trees with zero runtime execution.
+                    </p>
+                    <div className="pt-2 border-t border-[rgba(232,232,223,0.08)] font-mono text-[11px] text-[#A1A39B] flex items-center gap-2">
+                      <span className="text-[#C5F467]">Citations:</span>
+                      <span className="px-1.5 py-0.5 bg-[#191A18] border border-[rgba(232,232,223,0.08)] text-[#E8E8DF]">
+                        backend/app/services/ast_analyzer.py:L14-48
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: APIS & SCHEMA */}
+          {activeTab === "apis" && (
+            <div className="space-y-4 font-mono text-xs">
+              <div className="flex items-center justify-between border-b border-[rgba(232,232,223,0.08)] pb-2 text-[11px] text-[#A1A39B]">
+                <span>AST-EXTRACTED REST ENDPOINTS</span>
+                <span className="text-[#C5F467]">OpenAPI 3.1 Spec</span>
+              </div>
+
+              <div className="border border-[rgba(232,232,223,0.08)] rounded-sm overflow-hidden text-xs">
+                <div className="grid grid-cols-12 px-3 py-2 bg-[#141514] border-b border-[rgba(232,232,223,0.08)] text-[#A1A39B] font-semibold text-[11px]">
+                  <span className="col-span-2">METHOD</span>
+                  <span className="col-span-4">PATH</span>
+                  <span className="col-span-4">AST HANDLER</span>
+                  <span className="col-span-2 text-right">STATUS</span>
+                </div>
+                {[
+                  { method: "GET", path: "/api/v1/repos/{id}/wiki", handler: "get_repo_wiki()", status: "200 OK" },
+                  { method: "POST", path: "/api/v1/repos/analyze", handler: "trigger_analysis()", status: "201 Created" },
+                  { method: "GET", path: "/api/v1/repos/{id}/architecture", handler: "get_architecture_map()", status: "200 OK" },
+                  { method: "GET", path: "/api/v1/repos/{id}/security", handler: "get_security_audit()", status: "200 OK" },
+                ].map((ep) => (
+                  <div key={ep.path} className="grid grid-cols-12 px-3 py-2.5 border-b border-[rgba(232,232,223,0.04)] items-center">
+                    <span className="col-span-2 text-[#C5F467] font-bold">{ep.method}</span>
+                    <span className="col-span-4 text-[#E8E8DF]">{ep.path}</span>
+                    <span className="col-span-4 text-[#A1A39B] truncate">{ep.handler}</span>
+                    <span className="col-span-2 text-right text-[#A1A39B]">{ep.status}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: DATABASE ERD */}
+          {activeTab === "database" && (
+            <div className="space-y-4 font-mono text-xs">
+              <div className="flex items-center justify-between border-b border-[rgba(232,232,223,0.08)] pb-2 text-[11px] text-[#A1A39B]">
+                <span>RELATIONAL SCHEMA INFERRER</span>
+                <span className="text-[#C5F467]">SQLAlchemy & SQL DDL</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-3 bg-[#141514] border border-[rgba(232,232,223,0.08)] rounded-sm space-y-2">
+                  <div className="flex justify-between border-b border-[rgba(232,232,223,0.06)] pb-1 text-[#E8E8DF] font-bold">
+                    <span>repositories</span>
+                    <span className="text-[#C5F467] text-[10px]">TABLE</span>
+                  </div>
+                  <div className="space-y-1 text-[11px]">
+                    <div className="flex justify-between"><span className="text-[#C5F467]">id (PK)</span><span className="text-[#A1A39B]">UUID</span></div>
+                    <div className="flex justify-between"><span className="text-[#E8E8DF]">full_name</span><span className="text-[#A1A39B]">VARCHAR(255)</span></div>
+                    <div className="flex justify-between"><span className="text-[#E8E8DF]">default_branch</span><span className="text-[#A1A39B]">VARCHAR(64)</span></div>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-[#141514] border border-[rgba(232,232,223,0.08)] rounded-sm space-y-2">
+                  <div className="flex justify-between border-b border-[rgba(232,232,223,0.06)] pb-1 text-[#E8E8DF] font-bold">
+                    <span>wiki_chapters</span>
+                    <span className="text-[#C5F467] text-[10px]">TABLE</span>
+                  </div>
+                  <div className="space-y-1 text-[11px]">
+                    <div className="flex justify-between"><span className="text-[#C5F467]">id (PK)</span><span className="text-[#A1A39B]">UUID</span></div>
+                    <div className="flex justify-between"><span className="text-[#E8E8DF]">repo_id (FK)</span><span className="text-[#A1A39B]">UUID</span></div>
+                    <div className="flex justify-between"><span className="text-[#E8E8DF]">content_markdown</span><span className="text-[#A1A39B]">TEXT</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
     </div>

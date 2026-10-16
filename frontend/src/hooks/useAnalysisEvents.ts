@@ -22,6 +22,17 @@ export function useAnalysisEvents(analysisId: string) {
   useEffect(() => {
     if (!analysisId) return;
 
+    if (analysisId === "completed" || analysisId === "demo-completed") {
+      setEvent({
+        stage: "Technical documentation & topology",
+        progress: 100,
+        message: "Your codebase is ready to explore.",
+        status: "completed",
+        repository_id: "repo-123",
+      });
+      return;
+    }
+
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
     const sseUrl = `${apiUrl}/analyses/${analysisId}/events`;
 

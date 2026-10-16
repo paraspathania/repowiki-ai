@@ -57,13 +57,13 @@ function NavItem({
   const [showTooltip, setShowTooltip] = useState(false);
 
   const baseClass = `sidebar-nav-item group relative flex items-center ${
-    isExpanded ? "px-3 py-2 w-full justify-start gap-3" : "w-10 h-9 justify-center"
-  } rounded-xl transition-all duration-200 ${
+    isExpanded ? "px-3 py-2 w-full justify-start gap-2.5" : "w-9 h-8 justify-center"
+  } rounded-sm transition-colors duration-150 ${
     isLocked
-      ? "opacity-50 cursor-pointer text-slate-500 hover:opacity-70 hover:bg-white/[0.04]"
+      ? "opacity-50 cursor-pointer text-[#737373] hover:opacity-80 hover:bg-[#141414]"
       : isActive
-      ? "bg-indigo-600/30 text-white border border-indigo-500/40 shadow-sm shadow-indigo-500/20"
-      : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.06]"
+      ? "bg-[#1D1D1D] text-[#F5F5F5] before:absolute before:left-0 before:top-1 before:bottom-1 before:w-[2px] before:bg-[#F5F5F5]"
+      : "text-[#A3A3A3] hover:text-[#F5F5F5] hover:bg-[#141414]"
   }`;
 
   const tooltipContent = isLocked ? "Sign in to unlock" : label;
@@ -72,34 +72,33 @@ function NavItem({
     <>
       <div className="relative flex-shrink-0">
         <Icon
-          className={`w-4 h-4 transition-colors duration-200 ${
+          className={`w-3.5 h-3.5 transition-colors duration-150 ${
             isLocked
-              ? "text-slate-600"
+              ? "text-[#737373]"
               : isActive
-              ? "text-indigo-400"
-              : "text-slate-400 group-hover:text-slate-200"
+              ? "text-[#F5F5F5]"
+              : "text-[#737373] group-hover:text-[#F5F5F5]"
           }`}
         />
         {isLocked && (
-          <Lock className="w-2.5 h-2.5 text-slate-500 absolute -bottom-1 -right-1" />
+          <Lock className="w-2 h-2 text-[#737373] absolute -bottom-1 -right-1" />
         )}
       </div>
 
       {isExpanded && (
-        <span className="text-xs font-semibold truncate tracking-tight text-slate-200 group-hover:text-white flex-1">
+        <span className={`text-xs truncate tracking-tight flex-1 ${isActive ? "text-[#F5F5F5] font-semibold" : "text-[#A3A3A3] group-hover:text-[#F5F5F5]"}`}>
           {label}
         </span>
       )}
 
       {isExpanded && isLocked && (
-        <Lock className="w-3 h-3 text-slate-600 flex-shrink-0" />
+        <Lock className="w-2.5 h-2.5 text-[#737373] flex-shrink-0" />
       )}
 
       {/* Tooltip */}
       {!isExpanded && showTooltip && (
-        <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-[#1a1d27] text-white text-[11px] font-medium rounded-lg whitespace-nowrap z-50 pointer-events-none border border-white/[0.1] shadow-xl shadow-black/80 animate-fade-in">
+        <div className="absolute left-full ml-2 px-2.5 py-1 bg-[#141414] text-[#F5F5F5] text-[11px] font-mono rounded-sm whitespace-nowrap z-50 pointer-events-none border border-[#303030] shadow-xl">
           {tooltipContent}
-          <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1d27] border-l border-b border-white/[0.1] rotate-45" />
         </div>
       )}
     </>
@@ -149,22 +148,21 @@ function BottomNavItem({
 
   const content = (
     <>
-      <Icon className={`w-4 h-4 flex-shrink-0 transition-colors duration-200 ${isActive ? "text-indigo-400" : "group-hover:text-slate-300"}`} />
-      {isExpanded && <span className={`text-xs font-medium ${isActive ? "text-white font-semibold" : "text-slate-400 group-hover:text-slate-200"}`}>{label}</span>}
+      <Icon className={`w-3.5 h-3.5 flex-shrink-0 transition-colors duration-150 ${isActive ? "text-[#F5F5F5]" : "text-[#737373] group-hover:text-[#F5F5F5]"}`} />
+      {isExpanded && <span className={`text-xs ${isActive ? "text-[#F5F5F5] font-semibold" : "text-[#A3A3A3] group-hover:text-[#F5F5F5]"}`}>{label}</span>}
       {!isExpanded && showTooltip && (
-        <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-[#1a1d27] text-white text-[11px] font-medium rounded-lg whitespace-nowrap z-50 pointer-events-none border border-white/[0.1] shadow-xl shadow-black/80 animate-fade-in">
+        <div className="absolute left-full ml-2 px-2.5 py-1 bg-[#141414] text-[#F5F5F5] text-[11px] font-mono rounded-sm whitespace-nowrap z-50 pointer-events-none border border-[#303030] shadow-xl">
           {label}
-          <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1d27] border-l border-b border-white/[0.1] rotate-45" />
         </div>
       )}
     </>
   );
 
   const className = `sidebar-nav-item group relative flex items-center ${
-    isExpanded ? "px-3 py-2 w-full justify-start gap-3" : "w-10 h-9 justify-center"
-  } rounded-xl ${
-    isActive ? "bg-indigo-600/30 text-white border border-indigo-500/40" : "text-slate-500 hover:text-slate-300 hover:bg-white/[0.04]"
-  } transition-all duration-200`;
+    isExpanded ? "px-3 py-2 w-full justify-start gap-2.5" : "w-9 h-8 justify-center"
+  } rounded-sm ${
+    isActive ? "bg-[#1D1D1D] text-[#F5F5F5] before:absolute before:left-0 before:top-1 before:bottom-1 before:w-[2px] before:bg-[#F5F5F5]" : "text-[#737373] hover:text-[#F5F5F5] hover:bg-[#141414]"
+  } transition-colors duration-150`;
 
   if (href) {
     return (
@@ -212,15 +210,15 @@ function UserAvatar({ isExpanded }: { isExpanded: boolean }) {
   return (
     <button
       className={`group relative flex items-center ${
-        isExpanded ? "px-3 py-2 w-full justify-start gap-3" : "w-10 h-9 justify-center"
-      } rounded-xl hover:bg-white/[0.04] transition-all duration-200`}
+        isExpanded ? "px-3 py-2 w-full justify-start gap-2.5" : "w-9 h-8 justify-center"
+      } rounded-sm hover:bg-[#141414] transition-colors duration-150`}
       onClick={openProfileModal}
       title="View Profile"
     >
-      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 border border-white/20 flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0">
+      <div className="w-5 h-5 rounded-none bg-[#1D1D1D] border border-[#303030] flex items-center justify-center text-[9px] font-bold text-[#F5F5F5] flex-shrink-0 font-mono">
         {initials}
       </div>
-      {isExpanded && <span className="text-xs font-semibold text-slate-300 truncate">{user?.name}</span>}
+      {isExpanded && <span className="text-xs font-mono text-[#A3A3A3] group-hover:text-[#F5F5F5] truncate">{user?.name}</span>}
     </button>
   );
 }
@@ -251,29 +249,38 @@ export function RepositorySidebar({ repoId }: RepositorySidebarProps) {
   const isSettingsActive = pathname.startsWith(`/repositories/${repoId}/settings`);
 
   return (
-    <aside
-      className={`${
-        isExpanded ? "w-56" : "w-[56px]"
-      } bg-black border-r border-white/[0.08] flex flex-col items-center py-3 justify-between flex-shrink-0 z-30 transition-all duration-300 ease-in-out relative select-none`}
-    >
+    <>
+      {isExpanded && (
+        <div
+          className="fixed inset-0 bg-black/70 z-30 md:hidden backdrop-blur-[2px]"
+          onClick={() => setIsExpanded(false)}
+        />
+      )}
+      <aside
+        className={`${
+          isExpanded
+            ? "w-56 fixed md:relative inset-y-0 left-0 z-40 shadow-2xl md:shadow-none"
+            : "w-[48px] md:w-[52px]"
+        } bg-[#0A0A0A] border-r border-[#303030] flex flex-col items-center py-2.5 justify-between flex-shrink-0 z-30 transition-all duration-200 ease-in-out select-none`}
+      >
       {/* Sidebar Expand / Collapse Toggle Header */}
-      <div className="w-full px-2 pb-2 flex items-center justify-between border-b border-white/[0.06]">
+      <div className="w-full px-2 pb-2 flex items-center justify-between border-b border-[#303030]">
         {isExpanded && (
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2">
+          <span className="text-[10px] font-mono font-semibold text-[#737373] uppercase tracking-wider px-2">
             Navigation
           </span>
         )}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.08] transition mx-auto"
+          className="p-1 rounded-sm text-[#737373] hover:text-[#F5F5F5] hover:bg-[#141414] transition mx-auto"
           title={isExpanded ? "Collapse Sidebar" : "Expand Sidebar"}
         >
-          {isExpanded ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}
+          {isExpanded ? <PanelLeftClose className="w-3.5 h-3.5" /> : <PanelLeftOpen className="w-3.5 h-3.5" />}
         </button>
       </div>
 
       {/* Main Navigation list */}
-      <div className="flex flex-col items-center gap-1 overflow-y-auto max-h-[calc(100vh-140px)] no-scrollbar py-2 w-full px-2">
+      <div className="flex flex-col items-center gap-0.5 overflow-y-auto max-h-[calc(100vh-130px)] no-scrollbar py-2 w-full px-1.5">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const isLocked = !!item.requiresAuth && !isAuthenticated;
@@ -293,7 +300,7 @@ export function RepositorySidebar({ repoId }: RepositorySidebarProps) {
       </div>
 
       {/* Bottom utility icons */}
-      <div className="flex flex-col items-center gap-1 pt-2 border-t border-white/[0.06] w-full px-2">
+      <div className="flex flex-col items-center gap-0.5 pt-2 border-t border-[#303030] w-full px-1.5">
         <BottomNavItem icon={Bell} label="Notifications" isExpanded={isExpanded} />
         <BottomNavItem icon={HelpCircle} label="Help & Docs" isExpanded={isExpanded} />
         <BottomNavItem
@@ -306,5 +313,6 @@ export function RepositorySidebar({ repoId }: RepositorySidebarProps) {
         <UserAvatar isExpanded={isExpanded} />
       </div>
     </aside>
+    </>
   );
 }
